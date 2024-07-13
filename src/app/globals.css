@@ -31,3 +31,56 @@ body {
     text-wrap: balance;
   }
 }
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(5, 50px);
+  grid-template-rows: repeat(5, 50px);
+  grid-gap: 5px;
+  position: relative;
+}
+
+.row {
+  display: contents;
+}
+
+.cell {
+  width: 50px;
+  height: 50px;
+  background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  font-size: 24px;
+  position: relative;
+}
+
+.cell.goat {
+  background-color: lightgreen;
+}
+
+.cell.tiger {
+  background-color: lightcoral;
+}
+
+.diagonal {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.diagonal.top-left-bottom-right {
+  border-left: 2px solid #000;
+  border-bottom: 2px solid #000;
+  transform: rotate(45deg);
+  transform-origin: top left;
+}
+
+.diagonal.top-right-bottom-left {
+  border-right: 2px solid #000;
+  border-bottom: 2px solid #000;
+  transform: rotate(-45deg);
+  transform-origin: top right;
+}
