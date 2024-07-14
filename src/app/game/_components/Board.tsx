@@ -1,57 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { goatRules, tigerRules } from "@/lib/rules";
+import {Position, SelectedPosition } from "@/types/Board";
+import { validPositions } from "@/lib/validPosition";
+import Image from "next/image";
 
-type Position = {
-  name: string;
-  x: number;
-  y: number;
-};
-
-type BoardPosition = {
-  name: string;
-  x: number;
-  y: number;
-};
-
-type SelectedPosition = {
-  player: string;
-  name: string;
-  x: number;
-  y: number;
-};
-
-const validPositions: BoardPosition[] = [
-  { name:'1', x: 0, y: 0 }, { name:'2', x: 125, y: 0 }, { name:'3', x: 250, y: 0 }, { name:'4', x: 375, y: 0 }, { name:'5', x: 500, y: 0},
-  { name:'6', x: 0, y: 125 }, { name:'7', x: 125, y: 125 }, { name:'8', x: 250, y: 125 }, { name:'9', x: 375, y: 125 },{ name:'10', x: 500, y: 125},
-  { name:'11', x: 0, y: 250 }, { name:'12', x: 125, y: 250 }, { name:'13', x: 250, y: 250 }, { name:'14', x: 375, y: 250 }, { name:'15',x: 500, y: 250},
-  { name:'16', x: 0, y: 375 }, { name:'17', x: 125, y: 375 }, { name:'18', x: 250, y: 375 }, { name:'19', x: 375, y: 375 }, { name:'20',x: 500, y: 375},
-  { name:'21', x: 0, y: 500 }, { name:'22', x: 125, y: 500 }, { name:'23', x: 250, y: 500 }, { name:'24', x: 375, y: 500 }, { name:'25', x: 500, y: 500},
-];
-
-const checkBoardBoundary = (x: number, y: number) => {
-  const validPositions = [
-    {x, y:y-125}, {x, y:y+125}, {x:x-125, y}, {x:x+125, y}, // up-down & left-right movement
-    {x:x+125, y:y-125}, {x:x+125, y:y+125}, {x:x-125, y:y-125}, {x:x-125, y:y+125}  // diagonal movemen
-  ]
-  
-  let edge = ((x == 0 || x == 500) && (y == 125 || y == 375) || (y == 0 || y == 500) && (x == 125 || x == 375))  ? true : false
-  let between = (x ==250 && ((y == 125 || y == 375))) || (y == 250 && ((x == 125 || x == 375))) ? true : false
-  if (edge) {
-      return validPositions.slice(0, 4)
-  }
-  else if(between){
-    return validPositions.slice(0, 4)
-  }
-  return validPositions
-}
 
 export default function Board() {
   const [selectedPosition, setSelectedPosition] = useState<SelectedPosition | null>(null);
-  const [goatPositions, setGoatPositions] = useState<Position[]>([
-    { name: 'goat2', x: 0, y: 250 },
-    { name: 'goat1', x: 250, y: 500 },
-  ]);
+  const [selectedPositionFromTableGoat, setSelectedPositionFromTableGoat] = useState<any | null>(null);
+  const [goatPositions, setGoatPositions] = useState<Position[]>([]);
+  const [totalGoats, setTotalGoats] = useState(
+    [
+      { name: 'goat1' }, { name: 'goat2'},{ name: 'goat3'},{ name: 'goat4'},
+      { name: 'goat5' },{ name: 'goat6'},{ name: 'goat7'},{ name: 'goat8'},
+      { name: 'goat9'},{ name: 'goat10'},{ name: 'goat11'},{ name: 'goat12'},
+      { name: 'goat13'},{ name: 'goat14'},{ name: 'goat15'},{ name: 'goat16'},
+      { name: 'goat17'},{ name: 'goat18'},{ name: 'goat19'},{ name: 'goat20'}
+    ]);
+
+  const [turn, setTurn] = useState<'goat' | 'tiger'>('goat');
+  const [winner, setWinner] = useState<string | null>(null);
+  const [capturedGoats, setCapturedGoats] = useState(0);
+
 
   const [tigerPositions, setTigerPositions] = useState<Position[]>([
     { name: 'tiger1', x: 0, y: 0 },
@@ -60,45 +32,21 @@ export default function Board() {
     { name: 'tiger4', x: 500, y: 0 },
   ])
 
-  const goatRules = ({ selectedPosition, p }: any) => {
-    const x = selectedPosition.x;
-    const y = selectedPosition.y;
+  useEffect(() => {
+    // tiger won the game
+    if (capturedGoats >= 5) {
+      setWinner("Tiger");
+      alert("Tiger won the game!");
+    }else{
+     tigerPositions.forEach((tiger) => {
 
-    const newValidPosition = checkBoardBoundary(x, y);
-    for (let i = 0; i < newValidPosition.length; i++) {
-      if (p.x === newValidPosition[i].x && p.y === newValidPosition[i].y) {
-        return true;
-      }
+    })
     }
 
-    return false;
-  }
-
-  const tigerRules = ({ selectedPosition, p }: any) => {
-    const x = selectedPosition.x;
-    const y = selectedPosition.y;
-    const validMoves = checkBoardBoundary(x, y);
-
-    for (let move of validMoves) {
-      const middleX = (x + move.x) / 2;
-      const middleY = (y + move.y) / 2;
-
-      // Check if there's a goat to jump over and the landing position is valid and empty
-      const goatToCapture = goatPositions.find(goat => goat.x === middleX && goat.y === middleY);
-      const isLandingEmpty = !goatPositions.some(goat => goat.x === move.x && goat.y === move.y) &&
-                             !tigerPositions.some(tiger => tiger.x === move.x && tiger.y === move.y);
-
-      if (move.x === p.x && move.y === p.y && goatToCapture && isLandingEmpty) {
-        setGoatPositions(goatPositions.filter(goat => goat !== goatToCapture));
-        return true;
-      }
-    }
-
-    return false;
-  }
+}, [tigerPositions, goatPositions, capturedGoats]);
 
   return (
-    <div className="w-full h-screen bg-gray-900 flex items-center justify-center">
+    <div className="w-full relative h-screen bg-gray-900 flex items-center justify-center">
       <div className="relative h-[500px] w-[500px] border-2 border-white grid grid-cols-4 grid-rows-4">
         {/* Grid cells */}
         {Array.from({ length: 16 }).map((_, idx) => (
@@ -122,7 +70,7 @@ export default function Board() {
           <line x1="500" y1="250" x2="250" y2="500" stroke="white" strokeWidth="2" />
         </svg>
 
-        {validPositions.map((p, index) => {
+        { validPositions.map((p, index) => {
           const x = p.x;
           const y = p.y;
           return (
@@ -131,6 +79,29 @@ export default function Board() {
               style={{ top: `${y}px`, left: `${x}px` }}
               className="absolute transform opacity-100 translate-x-[-50%] translate-y-[-50%] bg-white h-[50px] w-[50px] rounded-full flex items-center justify-center"
             >
+
+              {
+                selectedPositionFromTableGoat?.name && (
+                  <div
+                    onClick={() => {
+                        const someGoat = goatPositions?.find((gp) => (gp.x === p.x && gp.y === p.y));
+                        const someTiger = tigerPositions?.find((tp) => (tp.x === p.x && tp.y === p.y));
+                        if(!(someGoat || someTiger)) {
+                            const newPosition = { name: selectedPositionFromTableGoat?.name, x, y };
+                            setGoatPositions([...goatPositions, newPosition]);
+                            const filterGoatFromTable  =  totalGoats?.filter((gp) => gp.name !== selectedPositionFromTableGoat?.name);
+                            setTotalGoats(filterGoatFromTable);
+                            setSelectedPositionFromTableGoat(null);
+                            setTurn('tiger');
+                        }else{
+                            setSelectedPositionFromTableGoat(null);
+                        }
+                    }}
+                    className="h-[30px] cursor-pointer w-[30px] border-2 border-orange-500 rounded-full"
+                  ></div>
+                )
+              }
+
               {selectedPosition?.name && selectedPosition?.player === 'goat' && (
                 <div
                   onClick={() => {
@@ -140,6 +111,7 @@ export default function Board() {
                       const newPosition = { name: selectedPosition?.name, x, y };
                       setGoatPositions([...filteredPositions, newPosition]);
                       setSelectedPosition(null);
+                      setTurn('tiger');
                     } else {
                       setSelectedPosition(null);
                     }
@@ -151,12 +123,16 @@ export default function Board() {
               {selectedPosition?.name && selectedPosition?.player === 'tiger' && (
                 <div
                   onClick={() => {
-                      const rules = tigerRules({ selectedPosition, p });
+                    const rules = tigerRules({ selectedPosition, p, validPositions, goatPositions, tigerPositions, setGoatPositions, capturedGoats, setCapturedGoats});
+                    if (rules) {
                       const filteredPositions = tigerPositions?.filter((tp) => tp.name !== selectedPosition?.name);
-                      const newPosition = { name: selectedPosition?.name, x, y };
+                      const newPosition = { name: selectedPosition?.name, x: p.x, y: p.y };
                       setTigerPositions([...filteredPositions, newPosition]);
                       setSelectedPosition(null);
+                      setTurn('goat');
+                    } else {
                       setSelectedPosition(null);
+                    }
                   }}
                   className="h-[30px] cursor-pointer w-[30px] border-2 border-orange-500 rounded-full"
                 ></div>
@@ -165,34 +141,98 @@ export default function Board() {
           );
         })}
 
-        {goatPositions?.length &&
-          goatPositions.map((p, index) => (
-            <div
-              key={index}
-              onClick={() => setSelectedPosition({ ...p, player: 'goat' })}
-              style={{
-                top: `${p.y}px`,
-                left: `${p.x}px`,
-                transform: 'translate(-50%, -50%)',
-              }}
-              className="absolute cursor-pointer bg-green-700 h-[30px] w-[30px] rounded-full"
-            ></div>
-          ))}
 
-        {tigerPositions?.length &&
-          tigerPositions.map((p, index) => (
+
+
+
+        {!!goatPositions?.length &&
+          goatPositions.map((p, index) => {
+            
+            console.log(p)
+            return(
             <div
-              key={index}
-              onClick={() => setSelectedPosition({ ...p, player: 'tiger' })}
+              key={p.name}
+              onClick={() => {
+                if(turn === 'goat'){
+                  setSelectedPositionFromTableGoat(null)
+                  setSelectedPosition({ ...p, player: 'goat' })}}
+                }
               style={{
                 top: `${p.y}px`,
                 left: `${p.x}px`,
                 transform: 'translate(-50%, -50%)',
               }}
-              className="absolute cursor-pointer bg-red-700 h-[30px] w-[30px] rounded-full"
-            ></div>
-          ))}
+              className="absolute cursor-pointer h-[40px] w-[40px] bg-green-700 rounded-full"
+            >
+              <Image src="/goat.png" alt="goat" width={40} height={40} />
+            </div>
+          )})}
+
+        {
+        !!tigerPositions?.length &&
+          tigerPositions.map((p, index) =>{ 
+            console.log(p)
+            return(
+            <div
+              key={p.name}
+              onClick={() => {
+                if(turn === 'tiger'){
+                  setSelectedPositionFromTableGoat(null)
+                  setSelectedPosition({ ...p, player: 'tiger' })
+                }
+              }
+              }
+              style={{
+                top: `${p.y}px`,
+                left: `${p.x}px`,
+                transform: 'translate(-50%, -50%)',
+              }}
+              className="absolute cursor-pointer h-[40px] w-[40px] bg-red-700 rounded-full"
+            >
+              <Image src="/tiger.png" alt="tiger" width={40} height={40} />
+            </div>
+          )})}
+
       </div>
+
+      <div className="absolute top-5 right-5 w-[300px] h-[80px] border-2 border-white flex items-center justify-center">
+            <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2">
+                  <div className=" border-2 bg-green-700 h-[40px] w-[40px]  border-white rounded-full">
+                  <Image src="/goat.png" alt="tiger" width={40} height={40} />
+
+                  </div>
+                  <p className="text-white">Goat</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className=" border-2 bg-red-700 h-[40px] w-[40px] border-white rounded-full">
+              <Image src="/tiger.png" alt="tiger" width={40} height={40} />
+
+                  </div>
+                  <p className="text-white">Tiger</p>
+                </div>
+            </div>
+      </div>
+
+      <div className="absolute bottom-5 right-5 w-[300px] gap-2 p-2 border-2 border-white flex items-center flex-wrap" >
+          {
+            totalGoats.map((p, index) => (
+              <div
+              key={p.name}
+              onClick={() => {
+                if(turn === 'goat'){
+                  setSelectedPosition(null);
+                  setSelectedPositionFromTableGoat({ ...p, player: 'goat' })
+                }
+              }}
+                className="cursor-pointer bg-green-700 rounded-full "
+              >
+                <Image src="/goat.png" alt="goat" width={40} height={40} />
+              </div>
+            ))
+          }
+      </div>
+
     </div>
   );
 }
