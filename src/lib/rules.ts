@@ -49,7 +49,7 @@ const checkBoardBoundary = (x: number, y: number) => {
       const jumpOverGoat = goatPositions.find((goat : any) => goat.x === (x + p.x) / 2 && goat.y === (y + p.y) / 2);
       if (jumpOverGoat && !goatPositions.some((goat : any) => goat.x === p.x && goat.y === p.y) &&
           !tigerPositions.some((tiger : any) => tiger.x === p.x && tiger.y === p.y) &&
-          validPositions.some((pos : any) => pos.x === p.x && pos.y === p.y)) {
+          newValidPosition.some((pos : any) => pos.x === p.x && pos.y === p.y)) {
             // yaha dekhi goat lai remove 
             setGoatPositions(goatPositions.filter((goat : any) => goat.name !== jumpOverGoat.name));
             setCapturedGoats(capturedGoats + 1);

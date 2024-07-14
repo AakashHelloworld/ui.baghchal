@@ -153,7 +153,8 @@ export default function Board() {
             <div
               key={p.name}
               onClick={() => {
-                if(turn === 'goat'){
+                if(turn === 'goat' && totalGoats.length == 0 ){
+                  console.log('goat won the game')
                   setSelectedPositionFromTableGoat(null)
                   setSelectedPosition({ ...p, player: 'goat' })}}
                 }
