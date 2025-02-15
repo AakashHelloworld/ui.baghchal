@@ -60,14 +60,14 @@ export default function Board() {
           viewBox="0 0 500 500"
         >
           {/* Outer diagonals */}
-          <line x1="0" y1="0" x2="500" y2="500" stroke="white" strokeWidth="2" />
-          <line x1="500" y1="0" x2="0" y2="500" stroke="white" strokeWidth="2" />
+          <line x1="0" y1="0" x2="500" y2="500" stroke="white" strokeWidth="1" />
+          <line x1="500" y1="0" x2="0" y2="500" stroke="white" strokeWidth="1" />
 
           {/* Inner diagonals for smaller squares */}
-          <line x1="0" y1="250" x2="250" y2="500" stroke="white" strokeWidth="2" />
-          <line x1="250" y1="0" x2="500" y2="250" stroke="white" strokeWidth="2" />
-          <line x1="250" y1="0" x2="0" y2="250" stroke="white" strokeWidth="2" />
-          <line x1="500" y1="250" x2="250" y2="500" stroke="white" strokeWidth="2" />
+          <line x1="0" y1="250" x2="250" y2="500" stroke="white" strokeWidth="1" />
+          <line x1="250" y1="0" x2="500" y2="250" stroke="white" strokeWidth="1" />
+          <line x1="250" y1="0" x2="0" y2="250" stroke="white" strokeWidth="1" />
+          <line x1="500" y1="250" x2="250" y2="500" stroke="white" strokeWidth="1" />
         </svg>
 
         { validPositions.map((p, index) => {
