@@ -9,11 +9,11 @@ export default function Game() {
     return (<>
       {/* <ResizablePanelGroup direction='horizontal' className='w-[100%] h-[100%]'> */}
       {/* <ResizablePanel> */}
-            {/* <Board /> */}
+            <Board />
         {/* </ResizablePanel> */}
         {/* <ResizableHandle /> */}
         {/* <ResizablePanel> */}
-            <Tree />
+            {/* <Tree /> */}
         {/* </ResizablePanel>
     </ResizablePanelGroup> */}
     </>)

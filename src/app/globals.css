@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Play:wght@400;700&display=swap');
+
 @tailwind base;
   @tailwind components;
   @tailwind utilities;
@@ -73,4 +75,40 @@
   font-weight: normal !important; /* Remove bold styling */
   stroke-width: 1 !important;     /* Remove automatic stroke width */
   transform: none !important;     /* Remove any automatic scaling applied */
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    }
+  body {
+    @apply bg-background text-foreground;
+    }
+}
+
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+
+*{
+  font-family: "Play", serif;
+  font-weight: 700;
+  font-style: normal;
 }
