@@ -7,14 +7,14 @@ import {
 import Tree from "./_components/Tree";
 export default function Game() {
     return (<>
-      {/* <ResizablePanelGroup direction='horizontal' className='w-[100%] h-[100%]'> */}
-      {/* <ResizablePanel> */}
+      {/* <ResizablePanelGroup direction='horizontal' className='w-[100%] h-[100%]'>
+      <ResizablePanel> */}
             <Board />
-        {/* </ResizablePanel> */}
-        {/* <ResizableHandle /> */}
-        {/* <ResizablePanel> */}
-            {/* <Tree /> */}
         {/* </ResizablePanel>
-    </ResizablePanelGroup> */}
+        <ResizableHandle />
+        <ResizablePanel>
+            <Tree />
+         </ResizablePanel>
+    </ResizablePanelGroup>  */}
     </>)
 }
