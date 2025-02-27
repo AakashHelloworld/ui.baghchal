@@ -7,11 +7,11 @@ import { validPositions } from "@/lib/validPosition";
 import Image from "next/image";
 import { Volume2, VolumeX } from "lucide-react";
 import Link from "next/link";
+import axios from "axios";
 
 export default function Board() {
   const [muted, setMuted] = useState<boolean>(false);
-  const [loading, setLoading] = useState(false);  // New loading state
-
+  const [loading, setLoading] = useState(false);
 
 
   const [board, setBoard] = useState<number[][]>([
@@ -22,16 +22,21 @@ export default function Board() {
     [-1, 0, 0, 0, -1],
   ]);
   const [turn, setTurn] = useState<'goat' | 'tiger'>('goat');
-  const [winner, setWinner] = useState<string | null>(null);
+
   const [totalGoats, setTotalGoats] = useState(20);
+
   const [capturedGoats, setCapturedGoats] = useState(0);
+
   const [tigerPositions, setTigerPositions] = useState<any[]>([
     [0, 0],
     [0, 4],
     [4, 0],
     [4, 4],
   ]);
+
   const [tigerBlocked, setTigerBlocked] = useState(0);
+
+
   function available_position(selectedPosition: any | null, board: number[][], turn: 'tiger' | 'goat') {
     if(selectedPosition === null) {
       return [];
@@ -114,9 +119,70 @@ export default function Board() {
   },[capturedGoats, board, tigerPositions, selectedPosition]);
 
 
+  const updateBoard = (data: any) => {
+    if (!data || data.length === 0) {
+        return;
+    }
+
+    if (Array.isArray(data[0]) && data[0].length === 2) {
+        // Case: [[2,2],[3,2]]
+        const [source, destination] = data;
+        setBoard((prevBoard) => {
+            const newBoard = [...prevBoard];
+            newBoard[source[0]][source[1]] = 0;
+            newBoard[destination[0]][destination[1]] = 1;
+            return newBoard;
+        });
+    } else if (data.length === 2 && typeof data[0] === "number") {
+        // Case: [2,2]
+        const source = data;
+        setBoard((prevBoard) => {
+            const newBoard = [...prevBoard];
+            newBoard[source[0]][source[1]] = 1;
+            return newBoard;
+        });
+    }
+
+    setTotalGoats((prevTotalGoats) => prevTotalGoats - 1);
+    setTurn("tiger");
+};
+
+  
+
+  const getBestMove = async () => {
+    setLoading(true);  // Start loading
+    try {
+      const response = await axios.post("/api/get_moves_goat", {
+        board: board,
+        tigers: tigerPositions,
+        total_goats: totalGoats,
+        goats_on_board: 20 - totalGoats, // Goats already placed
+        capture_goat: capturedGoats,
+        turn: turn,
+      });
+  
+      if (response.data.moves.length > 0) {
+        console.log("Best move from AI:", response.data.moves);
+        
+        updateBoard(response.data.moves);
+      }
+    } catch (error) {
+      console.error("Error fetching AI move:", error);
+    }finally{
+      setLoading(false);  // Stop loading
+    }
+  };
+
+  useEffect(() => {
+    if (turn === "goat") {
+      getBestMove();
+    }
+  }, [turn]);
+  
+
   return (
     <div className="w-full relative h-screen bg-[#143034] flex items-center justify-center p-4 bg-[url(/layout.jpg)] bg-no-repeat bg-center bg-cover">
-      <div className="relative h-[500px] w-[500px] border-2 border-white grid grid-cols-4 grid-rows-4 -translate-x-10">
+      <div className="relative h-[500px] w-[500px] border-2 border-white grid grid-cols-4 grid-rows-4 -translate-x-10 translate-y-10">
         {/* Grid cells */}
         {Array.from({ length: 16 }).map((_, idx) => (
           <div key={idx} className="border-2 border-white"></div>
@@ -166,14 +232,8 @@ export default function Board() {
                 {board[i][j] === 1 && 
                 <div 
                 className="absolute cursor-pointer h-[60px] w-[60px] bg-green-700 rounded-full p-1"
-                onClick={
-                  () => {
-                    
-                    if(turn === 'goat' && totalGoats <= 0 ) {
-                      setSelectedPosition({x: i, y: j, name: 'goat'});
-                    }
-                  }
-                } >
+
+>
                 <Image src="/goat.png" alt="goat" width={60} height={60} />
                 </div>
                 }
@@ -186,40 +246,7 @@ export default function Board() {
                   board[i][j] === 0 && <div className={`absolute cursor-pointer h-[60px] w-[60px] rounded-full ${available_position_fornow.some(([x, y] : any) => x === i && y === j) ? 'border-2 border-[#30833f] bg-[#30833f]/50' : ''}`}
                   
                   onClick={() => {
-                      if(turn === 'goat') {
-                        if(totalGoats > 0) {
-                          setBoard((prevBoard) => {
-                            const newBoard = [...prevBoard];
-                            newBoard[i][j] = 1;
-                            return newBoard;
-                          });
-                          setTotalGoats((prevTotalGoats) => prevTotalGoats - 1);
-                          setTurn('tiger');
-                        }else{
-
-                        if(selectedPosition != null){
-                          const find = positions.find(([[x, y], [nx, ny]] : any) => nx === i && ny === j);
-                          if(find?.length){
-
-                              const source = find![0];
-                              const destination = find![1];
-
-                              setBoard((prevBoard) => {
-                                const newBoard = [...prevBoard];
-                                newBoard[source[0]][source[1]] = 0;
-                                newBoard[destination[0]][destination[1]] = 1;
-                                return newBoard;
-                              });
-
-                              setTurn('tiger');
-                              setSelectedPosition(null);
-
-                          }
-                        }                          
-
-
-                        }
-                      }else if(turn === 'tiger') {
+                      if(turn === 'tiger') {
                         if(selectedPosition !== null) {
                           const find = positions.find(([[x, y], [nx, ny]] : any) => nx === i && ny === j);
                           if(find?.length){
@@ -327,7 +354,7 @@ export default function Board() {
       </div>
 
       <Link href="/">
-      <div className="absolute top-5 left-5 bg-[url(/back.png)] active:scale-90 transition-all w-[10rem] flex h-[5rem] justify-center items-center bg-center bg-cover p-3 rounded-full cursor-pointer" >
+      <div className="absolute top-5 left-5 bg-[url(/back.png)] active:scale-90 transition-all  w-[10rem] flex h-[5rem] justify-center items-center bg-center bg-cover p-3 rounded-full cursor-pointer" >
       <button
         className="bg-transparent"
       >
@@ -336,6 +363,12 @@ export default function Board() {
 
       </div>
       </Link>
+      {
+        loading &&
+      <div className="absolute top-[11rem] right-[6rem] bg-[url(/wooden.png)]  w-[10rem] h-[3.5rem] flex justify-center items-center bg-center bg-cover p-3 rounded-full cursor-pointer" >
+        <p>Ai is Thinking....</p>
+      </div>
+      }
 
     </div>
   );
