@@ -9,6 +9,8 @@ import { Volume2, VolumeX } from "lucide-react";
 import Link from "next/link";
 import axios from "axios";
 
+
+
 export default function Board() {
   const [muted, setMuted] = useState<boolean>(false);
   const [loading, setLoading] = useState(false);
@@ -152,7 +154,8 @@ export default function Board() {
   const getBestMove = async () => {
     setLoading(true);  // Start loading
     try {
-      const response = await axios.post("/api/get_moves_tiger", {
+
+      const response = await axios.post("https://baghchal-api.vercel.app/get_moves_tiger", {
         board: board,
         tigers: tigerPositions,
         total_goats: totalGoats,

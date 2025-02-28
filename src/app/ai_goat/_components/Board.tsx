@@ -123,10 +123,10 @@ export default function Board() {
     if (!data || data.length === 0) {
         return;
     }
-
     if (Array.isArray(data[0]) && data[0].length === 2) {
         // Case: [[2,2],[3,2]]
         const [source, destination] = data;
+        setTurn("tiger");
         setBoard((prevBoard) => {
             const newBoard = [...prevBoard];
             newBoard[source[0]][source[1]] = 0;
@@ -134,8 +134,9 @@ export default function Board() {
             return newBoard;
         });
     } else if (data.length === 2 && typeof data[0] === "number") {
-        // Case: [2,2]
         const source = data;
+        console.log("Source", source);
+        setTurn("tiger");
         setBoard((prevBoard) => {
             const newBoard = [...prevBoard];
             newBoard[source[0]][source[1]] = 1;
@@ -144,7 +145,7 @@ export default function Board() {
     }
 
     setTotalGoats((prevTotalGoats) => prevTotalGoats - 1);
-    setTurn("tiger");
+    
 };
 
   
@@ -152,7 +153,7 @@ export default function Board() {
   const getBestMove = async () => {
     setLoading(true);  // Start loading
     try {
-      const response = await axios.post("/api/get_moves_goat", {
+      const response = await axios.post("https://baghchal-api.vercel.app/get_moves_goat", {
         board: board,
         tigers: tigerPositions,
         total_goats: totalGoats,
@@ -162,6 +163,7 @@ export default function Board() {
       });
   
       if (response.data.moves.length > 0) {
+        setTurn("tiger");
         console.log("Best move from AI:", response.data.moves);
         
         updateBoard(response.data.moves);

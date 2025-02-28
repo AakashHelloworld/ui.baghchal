@@ -22,11 +22,11 @@ export default function GameOptions() {
       <div className="flex flex-col items-center justify-center space-y-1 mb-20">
         {step === "main" && (
           <>
-            <button className="w-[20rem] h-[8rem] text-black text-[2rem] text-2xl p-3 rounded-full active:scale-90 transition-all bg-[url(/wooden.png)] bg-center bg-cover hover:translate-y-2" onClick={() => setStep("play")}>
-              Play
+            <button className="w-[20rem] h-[8rem] text-[#000000] text-shadow text-[2rem] text-2xl p-3 rounded-full active:scale-90 transition-all bg-[url(/wooden.png)] bg-center bg-cover hover:translate-y-2 font-[900]" onClick={() => setStep("play")}>
+              PLAY
             </button>
-            <button className="w-[20rem] h-[8rem] text-black text-[2rem] text-2xl rounded-full active:scale-90 transition-all bg-[url(/wooden.png)] bg-center bg-cover hover:translate-y-2" onClick={() => setStep("computer")}>
-              Play vs Bot
+            <button className="w-[20rem] h-[8rem] text-black text-[2rem] text-2xl rounded-full active:scale-90 transition-all bg-[url(/wooden.png)] bg-center bg-cover hover:translate-y-2 font-[900]" onClick={() => setStep("computer")}>
+              PLAY VS BOT
             </button>
           </>
         )}
@@ -34,11 +34,11 @@ export default function GameOptions() {
         {step === "play" && (
           <>
           <Link href="/game">
-            <button className="w-[20rem] h-[8rem] text-black text-[2rem] text-2xl p-3 rounded-full active:scale-90 transition-all bg-[url(/wooden.png)] bg-center bg-cover hover:translate-y-2">
+            <button className="w-[20rem] h-[8rem] text-black text-[2rem] text-2xl p-3 rounded-full active:scale-90 transition-all bg-[url(/wooden.png)] bg-center bg-cover hover:translate-y-2 font-[900]" >
               Same Device
           </button>
             </Link>
-            <button className="w-[20rem] h-[8rem] text-black text-[2rem] text-2xl p-3 rounded-full active:scale-90 transition-all bg-[url(/wooden.png)] bg-center bg-cover hover:translate-y-2">
+            <button className="w-[20rem] h-[8rem] text-black text-[2rem] text-2xl p-3 rounded-full active:scale-90 transition-all bg-[url(/wooden.png)] bg-center bg-cover hover:translate-y-2 font-[900]">
               Friend
             </button>
           </>
@@ -47,12 +47,12 @@ export default function GameOptions() {
         {step === "computer" && (
           <>
           <Link href="/ai_tiger">
-            <button className="w-[20rem] h-[8rem] text-black text-[2rem] text-2xl p-3 rounded-full active:scale-90 transition-all bg-[url(/wooden.png)] bg-center bg-cover hover:translate-y-2">
+            <button className="w-[20rem] h-[8rem] text-black text-[2rem] text-2xl p-3 rounded-full active:scale-90 transition-all bg-[url(/wooden.png)] bg-center bg-cover hover:translate-y-2 font-[900]">
               Tiger Bot
             </button>
             </Link>
             <Link href="/ai_goat">
-            <button className="w-[20rem] h-[8rem] text-black text-[2rem] text-2xl p-3 rounded-full active:scale-90 transition-all bg-[url(/wooden.png)] bg-center bg-cover hover:translate-y-2">
+            <button className="w-[20rem] h-[8rem] text-black text-[2rem] text-2xl p-3 rounded-full active:scale-90 transition-all bg-[url(/wooden.png)] bg-center bg-cover hover:translate-y-2 font-[900]">
               Goat Bot
             </button>
             </Link>
