@@ -144,7 +144,7 @@ export default function Board() {
   //     withCredentials: true,
   //     transports: ["websocket", "polling"],
   // });
-    const socket_local = io("  https://aspiring-regular-ocarina.glitch.me/", {
+    const socket_local = io("https://foul-brindle-jaw.glitch.me", {
       withCredentials: true,
       transports: ["websocket", "polling"],
   });
