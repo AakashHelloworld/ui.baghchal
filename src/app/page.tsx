@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Volume2, VolumeX } from "lucide-react";
 import Link from "next/link";
-import { SoundToggler } from "./game/_components/soundToggler";
+import { SoundToggler } from "../components/shared/soundToggler";
 import { useSound } from "@/context/SoundContext";
 
 export default function GameOptions() {

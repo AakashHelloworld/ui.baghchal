@@ -7,7 +7,8 @@ import Link from "next/link";
 import { io } from 'socket.io-client';
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner"
-
+import { useSound } from "@/context/SoundContext";
+import { SoundToggler } from "@/components/shared/soundToggler";
 
 export default function Board() {
 
@@ -21,10 +22,21 @@ export default function Board() {
     [0, 0, 0, 0, 0],
     [-1, 0, 0, 0, -1],
   ]);
+  const {
+    playClick,
+    playTigerSound,
+    playGoatSound,
+    playGoatMoveSound,
+    playTigerWinSound,
+  } = useSound();
   
   const you = useSearchParams().get('you');
 
   const room = useSearchParams().get('room')
+
+  const user = useSearchParams().get('user');
+
+  const rating = useSearchParams().get('rating');
   
   const [turn, setTurn] = useState<'goat' | 'tiger'>('goat');
 
@@ -80,7 +92,7 @@ export default function Board() {
 
 
     if(capturedGoats >= 5) {
-        
+       playTigerWinSound();
        alert("Tiger Wins")
        setBoard([
         [-1, 0, 0, 0, -1],
@@ -183,6 +195,7 @@ export default function Board() {
               return newBoard;
           });
       }
+      playGoatMoveSound();
   
       setTotalGoats((prevTotalGoats) => prevTotalGoats - 1);
       
@@ -197,14 +210,21 @@ export default function Board() {
           const newBoard = [...prevBoard];
           newBoard[source[0]][source[1]] = 0;
           newBoard[destination[0]][destination[1]] = -1;
-
+          let khayo = false;
           if (Math.abs(destination[0] - source[0]) === 2 || Math.abs(destination[1] - source[1]) === 2) {
             const midX = (source[0] + destination[0]) / 2;
             const midY = (source[1] + destination[1]) / 2;
             if (newBoard[midX][midY] === 1) {
               newBoard[midX][midY] = 0; 
+              khayo = true;
               setCapturedGoats((prevCapturedGoats) => prevCapturedGoats + 1); 
             }
+          }
+
+          if(khayo ==true){
+            playGoatSound();
+          }else{
+            playTigerSound();
           }
           return newBoard;
         });
@@ -302,6 +322,7 @@ export default function Board() {
                           });
                           setTotalGoats((prevTotalGoats) => prevTotalGoats - 1);
                           setTurn('tiger');
+                          playGoatMoveSound();
                         }else{
 
                         if(selectedPosition != null){
@@ -326,8 +347,8 @@ export default function Board() {
                           }
                         }                          
 
-
                         }
+                        playGoatMoveSound();
                       }else if(turn === 'tiger' && you === 'tiger') {
                         if(selectedPosition !== null) {
                           const find = positions.find(([[x, y], [nx, ny]] : any) => nx === i && ny === j);
@@ -351,13 +372,21 @@ export default function Board() {
                               console.log(filterTigerPositions, "Filter Tiger Positions");
                               return filterTigerPositions;
                             }
-                            );  
+                            ); 
+                            let khayo = false; 
                             if(Math.abs(source[0] - destination[0]) === 2 || Math.abs(source[1] - destination[1]) === 2) {
                               const jumx = (source[0] + destination[0]) / 2;
                               const jumy = (source[1] + destination[1]) / 2;
                               if(board[jumx][jumy] === 1) {
+                                khayo = true;
                                 setCapturedGoats((prevCapturedGoats) => prevCapturedGoats + 1);
                               }
+                            }
+
+                            if(khayo == true){
+                              playGoatSound();
+                            }else{
+                              playTigerSound();
                             }
 
                             setBoard((prevBoard) => {
@@ -395,58 +424,95 @@ export default function Board() {
       </div>
 
 
-      <div className="absolute top-5 right-5 w-[22rem] h-[10rem] flex items-center bg-[url(/inf.png)]  bg-center bg-cover justify-center">
-            <div className="flex items-center gap-4 mt-6">
-                <div className="flex flex-col items-center gap-2">
-                  <p className="text-xl text-[black]">Tiger Blocked</p>
-                  <p className="text-xl text-[black]">{tigerBlocked}</p>
-                </div>
-                <div className="flex flex-col items-center gap-2">
-                  <p className="text-xl text-[black]">Goat Eaten</p>
-                  <p className="text-xl text-[black]">{capturedGoats}</p>
-                </div>
-            </div>
+      <div className="absolute top-5 right-5 w-[22rem] h-[10rem] flex flex-col  bg-[url(/inf.png)]  bg-center bg-cover justify-center">
+        <div className="flex items-center gap-4 mt-6 ml-[4rem]">
+          <div className="flex flex-col items-center gap-2">
+            <p className="text-xl text-[black] font-bold">Tiger Blocked</p>
+            <p className="text-xl text-[black] font-semibold ">{tigerBlocked}</p>
+          </div>
+          <div className="flex flex-col items-center gap-2">
+            <p className="text-xl text-[black] font-bold">Goat Eaten</p>
+            <p className="text-xl text-[black] font-semibold">{capturedGoats}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-4 ml-[4rem]">
+            <Image src="/goat.png" alt="tiger" width={40} height={40} /> <span className="text-xl font-semibold">{20 -totalGoats} </span>
+        </div>
       </div>
 
 
-      <div className="absolute bottom-5 right-5 w-[22rem] h-[10rem] flex items-center bg-[url(/detail.png)]  bg-center bg-cover justify-center">
-            <div className="flex items-center gap-8 mt-6">
-                <div className="flex items-center gap-2">
-                  <div className=" border-2 bg-green-700 h-[50px] w-[50px]  border-white rounded-full">
-                  <Image src="/goat.png" alt="tiger" width={50} height={50} />
 
-                  </div>
-                  <p className="text-xl text-[black]">Goat</p>
+      <div className="absolute bottom-5 right-5 w-[17rem] h-[6rem] flex items-center bg-[url(/detail.png)]  bg-center bg-cover justify-center">
+        <div className="flex items-center gap-8 mt-6">
+          {
+            turn === "goat" ? (
+              <div className="flex items-center gap-2 mb-4">
+                <div className=" border-2 bg-green-700 h-[50px] w-[50px]  border-white rounded-full">
+                  <Image
+                    src="/goat.png"
+                    alt="tiger"
+                    width={50}
+                    height={50}
+                  />
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className=" border-2 bg-red-700 h-[50px] w-[50px] border-white rounded-full">
-              <Image src="/tiger.png" alt="tiger" width={50} height={50} />
+                <p className="text-xl text-[black] font-bold">Goat</p>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 mb-4">
+                <div className=" border-2 bg-red-700 h-[50px] w-[50px] border-white rounded-full">
+                  <Image
+                    src="/tiger.png"
+                    alt="tiger"
+                    width={50}
+                    height={50}
+                  />
+                </div>
+                <p className="text-xl text-[black] font-bold">Tiger</p>
+              </div>
+            )
+          }
 
-                  </div>
-                  <p className="text-xl text-[black]">Tiger</p>
-                </div>
-            </div>
+        </div>
       </div>
 
-      <div className="absolute bottom-5 left-5 bg-[url(/audio_wooden.png)]  w-[10rem] h-[10rem] flex justify-center items-center bg-center bg-cover p-3 rounded-full cursor-pointer" >
-        <button
-        onClick={() => setMuted(!muted)}
-        className="bg-transparent mt-[-1rem]"
-      >
-        {muted ? <VolumeX size={44} color="black" /> : <Volume2 size={44} color="black" />}
-      </button>
-      </div>
+      <SoundToggler />
 
       <Link href="/">
       <div className="absolute top-5 left-5 bg-[url(/back.png)] active:scale-90 transition-all w-[10rem] flex h-[5rem] justify-center items-center bg-center bg-cover p-3 rounded-full cursor-pointer" >
       <button
         className="bg-transparent"
+        onClick={() => playClick()
+
+        }
+
       >
             <p className="text-xl text-[black]">Back</p>
       </button>
 
       </div>
       </Link>
+
+   
+        <div className=" absolute bg-[#143034] top-3 flex gap-4 items-center left-[40%] translate-x-[-60%] w-[15rem] h-[3rem] p-2 border border-[#317f41] rounded-md border-2" >
+          <div>
+          <Image src={you == "goat" ? '/tiger.png' : '/goat.png'} alt="tiger" width={40} height={40} />
+
+          </div>
+          <div>
+            <p className="text-xl text-[white] font-semibold">{user} {rating}</p>
+          </div>
+
+        </div>
+        <div className="absolute bg-[#143034] border border-[#317f41] rounded-md border-2 bottom-3 flex gap-4 items-center left-[40%] translate-x-[-60%] w-[15rem] h-[3rem] p-2" >
+          <div>
+        <Image src={you == "tiger" ? '/tiger.png' : '/goat.png'} alt="tiger" width={30} height={30} />
+
+          </div>
+          <div>
+            <p className="text-xl text-[white] font-semibold">Aakash (123)</p>
+          </div>
+        </div>
+
 
     </div>
   );

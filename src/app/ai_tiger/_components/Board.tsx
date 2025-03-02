@@ -8,14 +8,20 @@ import Image from "next/image";
 import { Volume2, VolumeX } from "lucide-react";
 import Link from "next/link";
 import axios from "axios";
-import { SoundToggler } from "@/app/game/_components/soundToggler";
+import { SoundToggler } from "@/components/shared/soundToggler";
 import { useSound } from "@/context/SoundContext";
 
 
 
 export default function Board() {
   const [loading, setLoading] = useState(false);
-  const { playClick } = useSound();
+  const {
+    playClick,
+    playTigerSound,
+    playGoatSound,
+    playGoatMoveSound,
+    playTigerWinSound,
+  } = useSound();
 
   const [board, setBoard] = useState<number[][]>([
     [-1, 0, 0, 0, -1],
@@ -105,7 +111,9 @@ export default function Board() {
   const [selectedPosition, setSelectedPosition] = useState<any | null>(null);
 
   useEffect(() => {
+    setTimeout(() => {
     if (capturedGoats >= 5) {
+      playTigerWinSound();
       alert("Tiger Wins");
       setBoard([
         [-1, 0, 0, 0, -1],
@@ -151,6 +159,7 @@ export default function Board() {
         setCapturedGoats(0);
       }
     }
+    }, 1);
   }, [capturedGoats, board, tigerPositions, selectedPosition]);
 
   const updateBoard = (x1: number, y1: number, x2: number, y2: number) => {
@@ -159,17 +168,24 @@ export default function Board() {
       newBoard[x1][y1] = 0; // Move tiger
       newBoard[x2][y2] = -1; // Place tiger at new position
 
+      let khayo = false;
       // Handle jumping and goat removal
       if (Math.abs(x2 - x1) === 2 || Math.abs(y2 - y1) === 2) {
         const midX = (x1 + x2) / 2;
         const midY = (y1 + y2) / 2;
         if (newBoard[midX][midY] === 1) {
+          khayo = true;
           // If there is a goat in the middle
           newBoard[midX][midY] = 0; // Remove the goat
           setCapturedGoats((prevCapturedGoats) => prevCapturedGoats + 1); // Increase captured goats count
         }
       }
-
+      if (khayo) {
+        playGoatSound();
+      }else{
+        playTigerSound();
+      }
+      khayo = false;
       return newBoard;
     });
 
@@ -364,6 +380,7 @@ export default function Board() {
                             }
                           }
                         }
+                        playGoatMoveSound();
                       }
                     }}
                   ></div>
@@ -374,64 +391,55 @@ export default function Board() {
         })}
       </div>
 
-      <div className="absolute top-5 right-5 w-[22rem] h-[10rem] flex items-center bg-[url(/inf.png)]  bg-center bg-cover justify-center">
-        <div className="flex items-center gap-4 mt-6">
+      <div className="absolute top-5 right-5 w-[22rem] h-[10rem] flex flex-col  bg-[url(/inf.png)]  bg-center bg-cover justify-center">
+        <div className="flex items-center gap-4 mt-6 ml-[4rem]">
           <div className="flex flex-col items-center gap-2">
-            <p className="text-xl text-[black]">Tiger Blocked</p>
-            <p className="text-xl text-[black]">{tigerBlocked}</p>
+            <p className="text-xl text-[black] font-bold">Tiger Blocked</p>
+            <p className="text-xl text-[black] font-semibold ">{tigerBlocked}</p>
           </div>
           <div className="flex flex-col items-center gap-2">
-            <p className="text-xl text-[black]">Goat Eaten</p>
-            <p className="text-xl text-[black]">{capturedGoats}</p>
+            <p className="text-xl text-[black] font-bold">Goat Eaten</p>
+            <p className="text-xl text-[black] font-semibold">{capturedGoats}</p>
           </div>
+        </div>
+        <div className="flex items-center gap-4 ml-[4rem]">
+            <Image src="/goat.png" alt="tiger" width={40} height={40} /> <span className="text-xl font-semibold">{20 -totalGoats} </span>
         </div>
       </div>
 
-      <div className="absolute bottom-5 right-5 w-[22rem] h-[10rem] flex items-center bg-[url(/detail.png)]  bg-center bg-cover justify-center">
+      <div className="absolute bottom-5 right-5 w-[17rem] h-[6rem] flex items-center bg-[url(/detail.png)]  bg-center bg-cover justify-center">
         <div className="flex items-center gap-8 mt-6">
-          <div className="flex items-center gap-2">
-            <div className=" border-2 bg-green-700 h-[50px] w-[50px]  border-white rounded-full">
-              <Image
-                src="/goat.png"
-                alt="tiger"
-                width={50}
-                height={50}
-              />
-            </div>
-            <p className="text-xl text-[black]">Goat</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className=" border-2 bg-red-700 h-[50px] w-[50px] border-white rounded-full">
-              <Image
-                src="/tiger.png"
-                alt="tiger"
-                width={50}
-                height={50}
-              />
-            </div>
-            <p className="text-xl text-[black]">Tiger</p>
-          </div>
+          {
+            turn === "goat" ? (
+              <div className="flex items-center gap-2 mb-4">
+                <div className=" border-2 bg-green-700 h-[50px] w-[50px]  border-white rounded-full">
+                  <Image
+                    src="/goat.png"
+                    alt="tiger"
+                    width={50}
+                    height={50}
+                  />
+                </div>
+                <p className="text-xl text-[black] font-bold">Goat</p>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 mb-4">
+                <div className=" border-2 bg-red-700 h-[50px] w-[50px] border-white rounded-full">
+                  <Image
+                    src="/tiger.png"
+                    alt="tiger"
+                    width={50}
+                    height={50}
+                  />
+                </div>
+                <p className="text-xl text-[black] font-bold">Tiger</p>
+              </div>
+            )
+          }
+
         </div>
       </div>
 
-      {/* <div className="absolute bottom-5 left-5 bg-[url(/audio_wooden.png)]  w-[10rem] h-[10rem] flex justify-center items-center bg-center bg-cover p-3 rounded-full cursor-pointer">
-        <button
-          onClick={() => setMuted(!muted)}
-          className="bg-transparent mt-[-1rem]"
-        >
-          {muted ? (
-            <VolumeX
-              size={44}
-              color="black"
-            />
-          ) : (
-            <Volume2
-              size={44}
-              color="black"
-            />
-          )}
-        </button>
-      </div> */}
       <SoundToggler />
 
       <Link href="/">
@@ -445,8 +453,8 @@ export default function Board() {
         </div>
       </Link>
       {loading && (
-        <div className="absolute top-[11rem] right-[6rem] bg-[url(/wooden.png)]  w-[10rem] h-[3.5rem] flex justify-center items-center bg-center bg-cover p-3 rounded-full cursor-pointer">
-          <p>Ai is Thinking....</p>
+        <div className="absolute top-5 left-1/2 translate-x-[-50%] bg-[url(/wooden.png)]  w-[10rem] h-[3.5rem] flex justify-center items-center bg-center bg-cover p-3 rounded-full cursor-pointer">
+          <p className="text-[black] font-bold">AI is Thinking....</p>
         </div>
       )}
     </div>
