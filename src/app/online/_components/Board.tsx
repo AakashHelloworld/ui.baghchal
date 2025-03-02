@@ -198,10 +198,10 @@ export default function Board() {
               newBoard[source[0]][source[1]] = 1;
               return newBoard;
           });
+          setTotalGoats((prevTotalGoats) => prevTotalGoats - 1);
       }
       playGoatMoveSound();
   
-      setTotalGoats((prevTotalGoats) => prevTotalGoats - 1);
       
 
       }else if(you == 'goat') {
