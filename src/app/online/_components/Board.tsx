@@ -1,19 +1,19 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
-import { goatRules, tigerRules } from "@/lib/rules";
-import {Position, SelectedPosition } from "@/types/Board";
-import { validPositions } from "@/lib/validPosition";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Volume2, VolumeX } from "lucide-react";
 import Link from "next/link";
+import { io } from 'socket.io-client';
+import { useSearchParams } from "next/navigation";
+import { toast } from "sonner"
+
 
 export default function Board() {
+
   const [muted, setMuted] = useState<boolean>(false);
   const [loading, setLoading] = useState(false);  // New loading state
-
-
-
+  const [socket, setSocket] = useState<any>(null);
   const [board, setBoard] = useState<number[][]>([
     [-1, 0, 0, 0, -1],
     [0, 0, 0, 0, 0],
@@ -21,7 +21,13 @@ export default function Board() {
     [0, 0, 0, 0, 0],
     [-1, 0, 0, 0, -1],
   ]);
+  
+  const you = useSearchParams().get('you');
+
+  const room = useSearchParams().get('room')
+  
   const [turn, setTurn] = useState<'goat' | 'tiger'>('goat');
+
   const [winner, setWinner] = useState<string | null>(null);
   const [totalGoats, setTotalGoats] = useState(20);
   const [capturedGoats, setCapturedGoats] = useState(0);
@@ -32,6 +38,7 @@ export default function Board() {
     [4, 4],
   ]);
   const [tigerBlocked, setTigerBlocked] = useState(0);
+
   function available_position(selectedPosition: any | null, board: number[][], turn: 'tiger' | 'goat') {
     if(selectedPosition === null) {
       return [];
@@ -67,56 +74,147 @@ export default function Board() {
   const [selectedPosition, setSelectedPosition] = useState<any | null>(null);
 
   useEffect(() => {
-    setTimeout(()=>{
-      if(capturedGoats >= 5) {
-
+    if(capturedGoats >= 5) {
         
-        alert("Tiger Wins")
-        setBoard([
-         [-1, 0, 0, 0, -1],
-         [0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0],
-         [-1, 0, 0, 0, -1],
-       ]);
-       setTurn('goat');
-       setTotalGoats(20);
-       setCapturedGoats(0);
-     }else{
-       let flag = true;
-       let tigerBlocked_now =0
-       console.log("Tiger Positions", tigerPositions);
-       tigerPositions.map(([x, y]) => {
-           let position = available_position({x, y, name: 'tiger'}, board, 'tiger');
-           if(position.length > 0) {
-             flag = false;
-           }else{
-             tigerBlocked_now = tigerBlocked_now + 1;
-           }
-       })
- 
-       console.log("Tiger Blocked", tigerBlocked_now);
-       setTigerBlocked(tigerBlocked_now);
- 
-       if(flag) {
-         alert("Goat Wins")
-         setBoard([
-           [-1, 0, 0, 0, -1],
-           [0, 0, 0, 0, 0],
-           [0, 0, 0, 0, 0],
-           [0, 0, 0, 0, 0],
-           [-1, 0, 0, 0, -1],
-         ]);
-         setTurn('goat');
-         setTotalGoats(20);
-         setCapturedGoats(0);
-       }
- 
-     }
-    },1)
+       alert("Tiger Wins")
+       setBoard([
+        [-1, 0, 0, 0, -1],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [-1, 0, 0, 0, -1],
+      ]);
+      setTurn('goat');
+      setTotalGoats(20);
+      setCapturedGoats(0);
+    }else{
+      let flag = true;
+      let tigerBlocked_now =0
+      console.log("Tiger Positions", tigerPositions);
+      tigerPositions.map(([x, y]) => {
+          let position = available_position({x, y, name: 'tiger'}, board, 'tiger');
+          if(position.length > 0) {
+            flag = false;
+          }else{
+            tigerBlocked_now = tigerBlocked_now + 1;
+          }
+      })
 
+      console.log("Tiger Blocked", tigerBlocked_now);
+      setTigerBlocked(tigerBlocked_now);
+
+      if(flag) {
+        alert("Goat Wins")
+        setBoard([
+          [-1, 0, 0, 0, -1],
+          [0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0],
+          [-1, 0, 0, 0, -1],
+        ]);
+        setTurn('goat');
+        setTotalGoats(20);
+        setCapturedGoats(0);
+      }
+
+    }
   },[capturedGoats, board, tigerPositions, selectedPosition]);
 
+
+  useEffect(() => {
+    const socket_local = io("http://192.168.10.90:5000", {
+      withCredentials: true,
+      transports: ["websocket", "polling"],
+  });
+  
+    setSocket(socket_local);
+    
+    socket_local.on("connect", () => {  
+      console.log("Socket connected:", socket_local.id); 
+      socket_local.emit("joinRoom", room);
+    });
+    socket_local.on("message", (msg : string) => {
+
+        toast(msg);
+    });
+
+    return () => {
+      socket_local.disconnect();
+    };
+  }, [room]);
+
+
+
+  useEffect(() => {
+    if(socket === null) {
+      return; 
+    }
+    socket.on("opponentMove", (move : any) => {
+
+      if(you == 'tiger') {
+
+
+        if (!move || move.length === 0) {
+          return;
+      }
+      if (Array.isArray(move[0]) && move[0].length === 2) {
+          // Case: [[2,2],[3,2]]
+          const [source, destination] = move;
+          setTurn("tiger");
+          setBoard((prevBoard) => {
+              const newBoard = [...prevBoard];
+              newBoard[source[0]][source[1]] = 0;
+              newBoard[destination[0]][destination[1]] = 1;
+              return newBoard;
+          });
+      } else if (move.length === 2 && typeof move[0] === "number") {
+          const source = move;
+          console.log("Source", source);
+          setTurn("tiger");
+          setBoard((prevBoard) => {
+              const newBoard = [...prevBoard];
+              newBoard[source[0]][source[1]] = 1;
+              return newBoard;
+          });
+      }
+  
+      setTotalGoats((prevTotalGoats) => prevTotalGoats - 1);
+      
+
+      }else if(you == 'goat') {
+
+        const source = move[0];
+
+        const destination = move[1];
+
+        setBoard((prevBoard) => {
+          const newBoard = [...prevBoard];
+          newBoard[source[0]][source[1]] = 0;
+          newBoard[destination[0]][destination[1]] = -1;
+
+          if (Math.abs(destination[0] - source[0]) === 2 || Math.abs(destination[1] - source[1]) === 2) {
+            const midX = (source[0] + destination[0]) / 2;
+            const midY = (source[1] + destination[1]) / 2;
+            if (newBoard[midX][midY] === 1) {
+              newBoard[midX][midY] = 0; 
+              setCapturedGoats((prevCapturedGoats) => prevCapturedGoats + 1); 
+            }
+          }
+          return newBoard;
+        });
+
+        setTigerPositions((prev) =>
+          prev.map(([x, y]) => (x === source[0] && y === source[1] ? [destination[0], destination[1]] : [x, y]))
+        );
+        setTurn('goat');
+
+      }
+    });
+
+    return () => {
+      socket.off("move");
+    }
+  }, [socket]);
 
   return (
     <div className="w-full relative h-screen bg-[#143034] flex items-center justify-center p-4 bg-[url(/layout.jpg)] bg-no-repeat bg-center bg-cover">
@@ -159,7 +257,7 @@ export default function Board() {
                 <div 
                 className="absolute cursor-pointer h-[60px] w-[60px] bg-red-700 rounded-full"
                 onClick={() => {
-                  if(turn === 'tiger') {
+                  if(turn === 'tiger' && you === 'tiger') {
                         setSelectedPosition({x: i, y: j, name: 'tiger'});
                   }
                 }}
@@ -173,7 +271,7 @@ export default function Board() {
                 onClick={
                   () => {
                     
-                    if(turn === 'goat' && totalGoats <= 0 ) {
+                    if(turn === 'goat' && totalGoats <= 0 && you === 'goat') {
                       setSelectedPosition({x: i, y: j, name: 'goat'});
                     }
                   }
@@ -182,16 +280,15 @@ export default function Board() {
                 </div>
                 }
 
-
-
-
-
                 {
                   board[i][j] === 0 && <div className={`absolute cursor-pointer h-[60px] w-[60px] rounded-full ${available_position_fornow.some(([x, y] : any) => x === i && y === j) ? 'border-2 border-[#30833f] bg-[#30833f]/50' : ''}`}
                   
                   onClick={() => {
-                      if(turn === 'goat') {
+                      if(turn === 'goat' && you === 'goat') {
                         if(totalGoats > 0) {
+
+                          socket.emit("move", {roomId:room, move:[i, j]});
+
                           setBoard((prevBoard) => {
                             const newBoard = [...prevBoard];
                             newBoard[i][j] = 1;
@@ -208,6 +305,8 @@ export default function Board() {
                               const source = find![0];
                               const destination = find![1];
 
+                              socket.emit("move", { roomId: room, move: [source, destination]});
+
                               setBoard((prevBoard) => {
                                 const newBoard = [...prevBoard];
                                 newBoard[source[0]][source[1]] = 0;
@@ -223,13 +322,15 @@ export default function Board() {
 
 
                         }
-                      }else if(turn === 'tiger') {
+                      }else if(turn === 'tiger' && you === 'tiger') {
                         if(selectedPosition !== null) {
                           const find = positions.find(([[x, y], [nx, ny]] : any) => nx === i && ny === j);
                           if(find?.length){
                             const source = find![0];
                             const destination = find![1];
 
+                            socket.emit("move", { roomId: room, move: [source, destination]});
+                        
                             setTigerPositions((prevTigerPositions) => {
                               console.log(source, "Source");
                               console.log(destination, "Destination");

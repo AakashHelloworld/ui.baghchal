@@ -4,7 +4,6 @@ import {
     ResizablePanel,
     ResizablePanelGroup,
   } from "@/components/ui/resizable"
-import Tree from "../../components/shared/Tree";
 export default function Game() {
     return (<>
       {/* <ResizablePanelGroup direction='horizontal' className='w-[100%] h-[100%]'>
