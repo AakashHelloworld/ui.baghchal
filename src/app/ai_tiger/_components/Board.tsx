@@ -11,6 +11,8 @@ import axios from "axios";
 import { SoundToggler } from "@/app/game/_components/soundToggler";
 import { useSound } from "@/context/SoundContext";
 
+
+
 export default function Board() {
   const [loading, setLoading] = useState(false);
   const { playClick } = useSound();
@@ -181,17 +183,15 @@ export default function Board() {
   const getBestMove = async () => {
     setLoading(true); // Start loading
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/get_moves_tiger",
-        {
-          board: board,
-          tigers: tigerPositions,
-          total_goats: totalGoats,
-          goats_on_board: 20 - totalGoats, // Goats already placed
-          capture_goat: capturedGoats,
-          turn: turn,
-        }
-      );
+
+      const response = await axios.post("https://baghchal-api.vercel.app/get_moves_tiger", {
+        board: board,
+        tigers: tigerPositions,
+        total_goats: totalGoats,
+        goats_on_board: 20 - totalGoats, // Goats already placed
+        capture_goat: capturedGoats,
+        turn: turn,
+      });
 
       if (response.data.moves.length > 0) {
         console.log("Best move from AI:", response.data.moves);

@@ -72,6 +72,7 @@ export default function GameOptions() {
               onClick={() => setStep("computer")}
             >
               Play vs Bot
+
             </button>
           </>
         )}
@@ -82,8 +83,9 @@ export default function GameOptions() {
               <button className="w-[20rem] h-[8rem] text-black text-[2rem] text-2xl p-3 rounded-full active:scale-90 transition-all bg-[url(/wooden.png)] bg-center bg-cover hover:translate-y-2">
                 Same Device
               </button>
+
             </Link>
-            <button className="w-[20rem] h-[8rem] text-black text-[2rem] text-2xl p-3 rounded-full active:scale-90 transition-all bg-[url(/wooden.png)] bg-center bg-cover hover:translate-y-2">
+            <button className="w-[20rem] h-[8rem] text-black text-[2rem] text-2xl p-3 rounded-full active:scale-90 transition-all bg-[url(/wooden.png)] bg-center bg-cover hover:translate-y-2 font-[900]">
               Friend
             </button>
           </>
@@ -100,6 +102,7 @@ export default function GameOptions() {
               <button className="w-[20rem] h-[8rem] text-black text-[2rem] text-2xl p-3 rounded-full active:scale-90 transition-all bg-[url(/wooden.png)] bg-center bg-cover hover:translate-y-2">
                 Goat Bot
               </button>
+
             </Link>
           </>
         )}

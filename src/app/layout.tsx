@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Toaster } from "@/components/ui/sonner"
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { SoundProvider } from "@/context/SoundContext";
@@ -19,6 +20,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <SoundProvider>{children}</SoundProvider>
+        <Toaster />
       </body>
     </html>
   );

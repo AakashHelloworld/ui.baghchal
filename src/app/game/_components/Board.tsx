@@ -103,54 +103,56 @@ export default function Board() {
   const [selectedPosition, setSelectedPosition] = useState<any | null>(null);
 
   useEffect(() => {
-    if (capturedGoats >= 5) {
-      playTigerWinSound();
-      alert("Tiger Wins");
-      setBoard([
-        [-1, 0, 0, 0, -1],
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0],
-        [-1, 0, 0, 0, -1],
-      ]);
-      setTurn("goat");
-      setTotalGoats(20);
-      setCapturedGoats(0);
-    } else {
-      let flag = true;
-      let tigerBlocked_now = 0;
-      console.log("Tiger Positions", tigerPositions);
-      tigerPositions.map(([x, y]) => {
-        let position = available_position(
-          { x, y, name: "tiger" },
-          board,
-          "tiger"
-        );
-        if (position.length > 0) {
-          flag = false;
-        } else {
-          tigerBlocked_now = tigerBlocked_now + 1;
-        }
-      });
+    setTimeout(()=>{
+      if(capturedGoats >= 5) {
 
-      console.log("Tiger Blocked", tigerBlocked_now);
-      setTigerBlocked(tigerBlocked_now);
-
-      if (flag) {
-        alert("Goat Wins");
+        playTigerWinSound();
+        alert("Tiger Wins")
         setBoard([
-          [-1, 0, 0, 0, -1],
-          [0, 0, 0, 0, 0],
-          [0, 0, 0, 0, 0],
-          [0, 0, 0, 0, 0],
-          [-1, 0, 0, 0, -1],
-        ]);
-        setTurn("goat");
-        setTotalGoats(20);
-        setCapturedGoats(0);
-      }
-    }
-  }, [capturedGoats, board, tigerPositions, selectedPosition]);
+         [-1, 0, 0, 0, -1],
+         [0, 0, 0, 0, 0],
+         [0, 0, 0, 0, 0],
+         [0, 0, 0, 0, 0],
+         [-1, 0, 0, 0, -1],
+       ]);
+       setTurn('goat');
+       setTotalGoats(20);
+       setCapturedGoats(0);
+     }else{
+       let flag = true;
+       let tigerBlocked_now =0
+       console.log("Tiger Positions", tigerPositions);
+       tigerPositions.map(([x, y]) => {
+           let position = available_position({x, y, name: 'tiger'}, board, 'tiger');
+           if(position.length > 0) {
+             flag = false;
+           }else{
+             tigerBlocked_now = tigerBlocked_now + 1;
+           }
+       })
+ 
+       console.log("Tiger Blocked", tigerBlocked_now);
+       setTigerBlocked(tigerBlocked_now);
+ 
+       if(flag) {
+         alert("Goat Wins")
+         setBoard([
+           [-1, 0, 0, 0, -1],
+           [0, 0, 0, 0, 0],
+           [0, 0, 0, 0, 0],
+           [0, 0, 0, 0, 0],
+           [-1, 0, 0, 0, -1],
+         ]);
+         setTurn('goat');
+         setTotalGoats(20);
+         setCapturedGoats(0);
+       }
+ 
+     }
+    },1)
+
+  },[capturedGoats, board, tigerPositions, selectedPosition]);
+
 
   return (
     <div className="w-full relative h-screen bg-[#143034] flex items-center justify-center p-4 bg-[url(/layout.jpg)] bg-no-repeat bg-center bg-cover">

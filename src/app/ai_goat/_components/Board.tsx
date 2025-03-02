@@ -45,7 +45,7 @@ export default function Board() {
     if (selectedPosition === null) {
       return [];
     }
-
+    
     let directions = [];
 
     if ((selectedPosition.x + selectedPosition.y) % 2 != 0) {
@@ -153,46 +153,50 @@ export default function Board() {
     if (!data || data.length === 0) {
       return;
     }
-
     if (Array.isArray(data[0]) && data[0].length === 2) {
-      // Case: [[2,2],[3,2]]
-      const [source, destination] = data;
-      setBoard((prevBoard) => {
-        const newBoard = [...prevBoard];
-        newBoard[source[0]][source[1]] = 0;
-        newBoard[destination[0]][destination[1]] = 1;
-        return newBoard;
-      });
+
+        // Case: [[2,2],[3,2]]
+        const [source, destination] = data;
+        setTurn("tiger");
+        setBoard((prevBoard) => {
+            const newBoard = [...prevBoard];
+            newBoard[source[0]][source[1]] = 0;
+            newBoard[destination[0]][destination[1]] = 1;
+            return newBoard;
+        });
     } else if (data.length === 2 && typeof data[0] === "number") {
-      // Case: [2,2]
-      const source = data;
-      setBoard((prevBoard) => {
-        const newBoard = [...prevBoard];
-        newBoard[source[0]][source[1]] = 1;
-        return newBoard;
-      });
+        const source = data;
+        console.log("Source", source);
+        setTurn("tiger");
+        setBoard((prevBoard) => {
+            const newBoard = [...prevBoard];
+            newBoard[source[0]][source[1]] = 1;
+            return newBoard;
+        });
     }
 
     setTotalGoats((prevTotalGoats) => prevTotalGoats - 1);
-    setTurn("tiger");
-  };
+    
+};
+
+  
 
   const getBestMove = async () => {
     setLoading(true); // Start loading
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/get_moves_goat",
-        {
-          board: board,
-          tigers: tigerPositions,
-          total_goats: totalGoats,
-          goats_on_board: 20 - totalGoats, // Goats already placed
-          capture_goat: capturedGoats,
-          turn: turn,
-        }
-      );
+
+      const response = await axios.post("https://baghchal-api.vercel.app/get_moves_goat", {
+        board: board,
+        tigers: tigerPositions,
+        total_goats: totalGoats,
+        goats_on_board: 20 - totalGoats, // Goats already placed
+        capture_goat: capturedGoats,
+        turn: turn,
+      });
+  
 
       if (response.data.moves.length > 0) {
+        setTurn("tiger");
         console.log("Best move from AI:", response.data.moves);
 
         updateBoard(response.data.moves);

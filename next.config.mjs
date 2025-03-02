@@ -23,6 +23,7 @@ const nextConfig = {
 
     return config;
   },
+
 };
 
 export default nextConfig;
