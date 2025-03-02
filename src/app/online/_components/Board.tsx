@@ -74,6 +74,11 @@ export default function Board() {
   const [selectedPosition, setSelectedPosition] = useState<any | null>(null);
 
   useEffect(() => {
+
+
+    setTimeout(()=>{
+
+
     if(capturedGoats >= 5) {
         
        alert("Tiger Wins")
@@ -118,6 +123,7 @@ export default function Board() {
       }
 
     }
+  },1)
   },[capturedGoats, board, tigerPositions, selectedPosition]);
 
 

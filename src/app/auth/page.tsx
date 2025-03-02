@@ -66,7 +66,7 @@ export default function AuthPage() {
             placeholder="Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="w-[16rem] h-[6rem] text-black text-[1.5rem] p-3 rounded-full active:scale-90 transition-all bg-transparent bg-[url(/wooden.png)] bg-center bg-cover hover:translate-y-2 outline-none text-center placeholder-black/70"
+            className="w-[16rem] h-[6rem] text-black text-[1.5rem] p-3 rounded-full active:scale-90 transition-all bg-transparent bg-[url(/wooden.png)] bg-center bg-cover hover:translate-y-2 outline-none text-center placeholder-[white]"
           />
 
           <input
@@ -74,7 +74,7 @@ export default function AuthPage() {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-[16rem] h-[6rem] text-black text-[1.5rem] p-3 rounded-full active:scale-90 transition-all bg-transparent bg-[url(/wooden.png)] bg-center bg-cover hover:translate-y-2 outline-none text-center placeholder-black/70"
+            className="w-[16rem] h-[6rem] text-black text-[1.5rem] p-3 rounded-full active:scale-90 transition-all bg-transparent bg-[url(/wooden.png)] bg-center bg-cover hover:translate-y-2 outline-none text-center placeholder-[white]"
           />
 
           <button
@@ -98,7 +98,7 @@ export default function AuthPage() {
             placeholder="Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="w-[16rem] h-[6rem] text-black text-[1.5rem] p-3 rounded-full active:scale-90 transition-all bg-transparent bg-[url(/wooden.png)] bg-center bg-cover hover:translate-y-2 outline-none text-center placeholder-black/70"
+            className="w-[16rem] h-[6rem] text-black text-[1.5rem] p-3 rounded-full active:scale-90 transition-all bg-transparent bg-[url(/wooden.png)] bg-center bg-cover hover:translate-y-2 outline-none text-center placeholder-[white]"
           />
 
           <input
@@ -106,7 +106,7 @@ export default function AuthPage() {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-[16rem] h-[6rem] text-black text-[1.5rem] p-3 rounded-full active:scale-90 transition-all bg-transparent bg-[url(/wooden.png)] bg-center bg-cover hover:translate-y-2 outline-none text-center placeholder-black/70"
+            className="w-[16rem] h-[6rem] text-black text-[1.5rem] p-3 rounded-full active:scale-90 transition-all bg-transparent bg-[url(/wooden.png)] bg-center bg-cover hover:translate-y-2 outline-none text-center placeholder-[white]"
           />
 
           <button
