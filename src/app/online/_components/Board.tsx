@@ -140,7 +140,11 @@ export default function Board() {
 
 
   useEffect(() => {
-    const socket_local = io("http://192.168.10.90:5000", {
+  //   const socket_local = io("http://192.168.10.90:5000", {
+  //     withCredentials: true,
+  //     transports: ["websocket", "polling"],
+  // });
+    const socket_local = io("  https://aspiring-regular-ocarina.glitch.me/", {
       withCredentials: true,
       transports: ["websocket", "polling"],
   });
