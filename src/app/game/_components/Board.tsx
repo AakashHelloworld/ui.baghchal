@@ -383,21 +383,39 @@ export default function Board() {
         })}
       </div>
 
-      <div className="absolute top-5 right-5 w-[22rem] h-[10rem] flex flex-col  bg-[url(/inf.png)]  bg-center bg-cover justify-center">
-        <div className="flex items-center gap-4 mt-6 ml-[4rem]">
-          <div className="flex flex-col items-center gap-2">
-            <p className="text-xl text-[black] font-bold">Tiger Blocked</p>
+      <div className="absolute top-5 right-5 w-[22rem] h-[10rem] flex flex-col  bg-[url(/inf.png)]  bg-center bg-cover">
+      <div className="w-full flex justify-center gap-4 mt-6">
+        <div className="flex items-center gap-[4rem] mt-6 ">
+          <div className="flex items-center gap-2">
+            <div>
+              <Image 
+              src={'/tigercross.png'}
+              alt="tiger"
+              width={40}
+              height={40}
+              />
+            </div>
             <p className="text-xl text-[black] font-semibold ">{tigerBlocked}</p>
           </div>
-          <div className="flex flex-col items-center gap-2">
-            <p className="text-xl text-[black] font-bold">Goat Eaten</p>
+          <div className="flex items-center gap-2">
+          <div>
+              <Image 
+              src={'/goatcross.png'}
+              alt="tiger"
+              width={40}
+              height={40}
+              />
+            </div>
             <p className="text-xl text-[black] font-semibold">{capturedGoats}</p>
           </div>
         </div>
-        <div className="flex items-center gap-4 ml-[4rem]">
-            <Image src="/goat.png" alt="tiger" width={40} height={40} /> <span className="text-xl font-semibold">{20 -totalGoats} </span>
+        </div>
+        <div className="w-[76%] flex justify-end gap-2 mt-2">
+            <Image src="/goat.png" alt="tiger" width={35} height={35} /> <span className="text-xl font-semibold">{20 -totalGoats}</span>
         </div>
       </div>
+
+      
 
       <div className="absolute bottom-5 right-5 w-[17rem] h-[6rem] flex items-center bg-[url(/detail.png)]  bg-center bg-cover justify-center">
         <div className="flex items-center gap-8 mt-6">
