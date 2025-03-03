@@ -184,12 +184,8 @@ export default function Board() {
             return newBoard;
         });
           playGoatMoveSound();
+          setTotalGoats((prevTotalGoats) => prevTotalGoats - 1);
     }
-    setTotalGoats((prevTotalGoats) => prevTotalGoats - 1);
-
-
-
-    
 };
 
   
