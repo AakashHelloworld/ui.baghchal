@@ -92,7 +92,7 @@ export default function AuthPage() {
             onClick={() => setAuthPage("signup")}
             className="text-white text-lg hover:underline"
           >
-            Don't have an account? Sign up
+            Don &apos;t have an account? Sign up
           </div>
         </div>
       ) : (

@@ -7,12 +7,11 @@ import Link from "next/link";
 import { io } from 'socket.io-client';
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner"
-
+import { useSound } from "@/context/SoundContext";
+import { SoundToggler } from "@/components/shared/soundToggler";
 
 export default function Board() {
 
-  const [muted, setMuted] = useState<boolean>(false);
-  const [loading, setLoading] = useState(false);  // New loading state
   const [socket, setSocket] = useState<any>(null);
   const [board, setBoard] = useState<number[][]>([
     [-1, 0, 0, 0, -1],
@@ -21,10 +20,25 @@ export default function Board() {
     [0, 0, 0, 0, 0],
     [-1, 0, 0, 0, -1],
   ]);
+  const {
+    playClick,
+    playTigerSound,
+    playGoatSound,
+    playGoatMoveSound,
+    playTigerWinSound,
+  } = useSound();
   
   const you = useSearchParams().get('you');
 
   const room = useSearchParams().get('room')
+
+  const user = useSearchParams().get('user');
+
+  const rating = useSearchParams().get('rating');
+
+
+  const myname = "Aakash"
+  const myrating = '123'
   
   const [turn, setTurn] = useState<'goat' | 'tiger'>('goat');
 
@@ -80,18 +94,8 @@ export default function Board() {
 
 
     if(capturedGoats >= 5) {
-        
-       alert("Tiger Wins")
-       setBoard([
-        [-1, 0, 0, 0, -1],
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0],
-        [-1, 0, 0, 0, -1],
-      ]);
-      setTurn('goat');
-      setTotalGoats(20);
-      setCapturedGoats(0);
+       playTigerWinSound();
+       setWinner('tiger_win');
     }else{
       let flag = true;
       let tigerBlocked_now =0
@@ -109,17 +113,7 @@ export default function Board() {
       setTigerBlocked(tigerBlocked_now);
 
       if(flag) {
-        alert("Goat Wins")
-        setBoard([
-          [-1, 0, 0, 0, -1],
-          [0, 0, 0, 0, 0],
-          [0, 0, 0, 0, 0],
-          [0, 0, 0, 0, 0],
-          [-1, 0, 0, 0, -1],
-        ]);
-        setTurn('goat');
-        setTotalGoats(20);
-        setCapturedGoats(0);
+        setWinner('goat_win');
       }
 
     }
@@ -128,7 +122,11 @@ export default function Board() {
 
 
   useEffect(() => {
-    const socket_local = io("http://192.168.10.90:5000", {
+  //   const socket_local = io("http://192.168.10.90:5000", {
+  //     withCredentials: true,
+  //     transports: ["websocket", "polling"],
+  // });
+    const socket_local = io("https://foul-brindle-jaw.glitch.me", {
       withCredentials: true,
       transports: ["websocket", "polling"],
   });
@@ -182,9 +180,10 @@ export default function Board() {
               newBoard[source[0]][source[1]] = 1;
               return newBoard;
           });
+          setTotalGoats((prevTotalGoats) => prevTotalGoats - 1);
       }
+      playGoatMoveSound();
   
-      setTotalGoats((prevTotalGoats) => prevTotalGoats - 1);
       
 
       }else if(you == 'goat') {
@@ -197,14 +196,21 @@ export default function Board() {
           const newBoard = [...prevBoard];
           newBoard[source[0]][source[1]] = 0;
           newBoard[destination[0]][destination[1]] = -1;
-
+          let khayo = false;
           if (Math.abs(destination[0] - source[0]) === 2 || Math.abs(destination[1] - source[1]) === 2) {
             const midX = (source[0] + destination[0]) / 2;
             const midY = (source[1] + destination[1]) / 2;
             if (newBoard[midX][midY] === 1) {
               newBoard[midX][midY] = 0; 
+              khayo = true;
               setCapturedGoats((prevCapturedGoats) => prevCapturedGoats + 1); 
             }
+          }
+
+          if(khayo ==true){
+            playGoatSound();
+          }else{
+            playTigerSound();
           }
           return newBoard;
         });
@@ -302,6 +308,7 @@ export default function Board() {
                           });
                           setTotalGoats((prevTotalGoats) => prevTotalGoats - 1);
                           setTurn('tiger');
+                          playGoatMoveSound();
                         }else{
 
                         if(selectedPosition != null){
@@ -326,8 +333,8 @@ export default function Board() {
                           }
                         }                          
 
-
                         }
+                        playGoatMoveSound();
                       }else if(turn === 'tiger' && you === 'tiger') {
                         if(selectedPosition !== null) {
                           const find = positions.find(([[x, y], [nx, ny]] : any) => nx === i && ny === j);
@@ -351,13 +358,21 @@ export default function Board() {
                               console.log(filterTigerPositions, "Filter Tiger Positions");
                               return filterTigerPositions;
                             }
-                            );  
+                            ); 
+                            let khayo = false; 
                             if(Math.abs(source[0] - destination[0]) === 2 || Math.abs(source[1] - destination[1]) === 2) {
                               const jumx = (source[0] + destination[0]) / 2;
                               const jumy = (source[1] + destination[1]) / 2;
                               if(board[jumx][jumy] === 1) {
+                                khayo = true;
                                 setCapturedGoats((prevCapturedGoats) => prevCapturedGoats + 1);
                               }
+                            }
+
+                            if(khayo == true){
+                              playGoatSound();
+                            }else{
+                              playTigerSound();
                             }
 
                             setBoard((prevBoard) => {
@@ -395,58 +410,203 @@ export default function Board() {
       </div>
 
 
-      <div className="absolute top-5 right-5 w-[22rem] h-[10rem] flex items-center bg-[url(/inf.png)]  bg-center bg-cover justify-center">
-            <div className="flex items-center gap-4 mt-6">
-                <div className="flex flex-col items-center gap-2">
-                  <p className="text-xl text-[black]">Tiger Blocked</p>
-                  <p className="text-xl text-[black]">{tigerBlocked}</p>
-                </div>
-                <div className="flex flex-col items-center gap-2">
-                  <p className="text-xl text-[black]">Goat Eaten</p>
-                  <p className="text-xl text-[black]">{capturedGoats}</p>
-                </div>
-            </div>
-      </div>
-
-
-      <div className="absolute bottom-5 right-5 w-[22rem] h-[10rem] flex items-center bg-[url(/detail.png)]  bg-center bg-cover justify-center">
-            <div className="flex items-center gap-8 mt-6">
+            <div className="absolute top-5 right-5 w-[22rem] h-[10rem] flex flex-col  bg-[url(/inf.png)]  bg-center bg-cover">
+            <div className="w-full flex justify-center gap-4 mt-6">
+              <div className="flex items-center gap-[4rem] mt-6 ">
                 <div className="flex items-center gap-2">
-                  <div className=" border-2 bg-green-700 h-[50px] w-[50px]  border-white rounded-full">
-                  <Image src="/goat.png" alt="tiger" width={50} height={50} />
-
+                  <div>
+                    <Image 
+                    src={'/tigercross.png'}
+                    alt="tiger"
+                    width={40}
+                    height={40}
+                    />
                   </div>
-                  <p className="text-xl text-[black]">Goat</p>
+                  <p className="text-xl text-[black] font-semibold ">{tigerBlocked}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className=" border-2 bg-red-700 h-[50px] w-[50px] border-white rounded-full">
-              <Image src="/tiger.png" alt="tiger" width={50} height={50} />
-
+                <div>
+                    <Image 
+                    src={'/goatcross.png'}
+                    alt="tiger"
+                    width={40}
+                    height={40}
+                    />
                   </div>
-                  <p className="text-xl text-[black]">Tiger</p>
+                  <p className="text-xl text-[black] font-semibold">{capturedGoats}</p>
                 </div>
+              </div>
+              </div>
+              <div className="w-[76%] flex justify-end gap-2 mt-2">
+                  <Image src="/goat.png" alt="tiger" width={35} height={35} /> <span className="text-xl font-semibold">{20 -totalGoats}</span>
+              </div>
             </div>
+
+
+
+      <div className="absolute bottom-5 right-5 w-[17rem] h-[6rem] flex items-center bg-[url(/detail.png)]  bg-center bg-cover justify-center">
+        <div className="flex items-center gap-8 mt-6">
+          {
+            turn === "goat" ? (
+              <div className="flex items-center gap-2 mb-4">
+                <div className=" border-2 bg-green-700 h-[50px] w-[50px]  border-white rounded-full">
+                  <Image
+                    src="/goat.png"
+                    alt="tiger"
+                    width={50}
+                    height={50}
+                  />
+                </div>
+                <p className="text-xl text-[black] font-bold">Goat</p>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 mb-4">
+                <div className=" border-2 bg-red-700 h-[50px] w-[50px] border-white rounded-full">
+                  <Image
+                    src="/tiger.png"
+                    alt="tiger"
+                    width={50}
+                    height={50}
+                  />
+                </div>
+                <p className="text-xl text-[black] font-bold">Tiger</p>
+              </div>
+            )
+          }
+
+        </div>
       </div>
 
-      <div className="absolute bottom-5 left-5 bg-[url(/audio_wooden.png)]  w-[10rem] h-[10rem] flex justify-center items-center bg-center bg-cover p-3 rounded-full cursor-pointer" >
-        <button
-        onClick={() => setMuted(!muted)}
-        className="bg-transparent mt-[-1rem]"
-      >
-        {muted ? <VolumeX size={44} color="black" /> : <Volume2 size={44} color="black" />}
-      </button>
-      </div>
+      <SoundToggler />
 
       <Link href="/">
       <div className="absolute top-5 left-5 bg-[url(/back.png)] active:scale-90 transition-all w-[10rem] flex h-[5rem] justify-center items-center bg-center bg-cover p-3 rounded-full cursor-pointer" >
       <button
         className="bg-transparent"
+        onClick={() => playClick()
+
+        }
+
       >
             <p className="text-xl text-[black]">Back</p>
       </button>
 
       </div>
       </Link>
+
+   
+        <div className=" absolute bg-[#143034] top-3 flex gap-4 items-center left-[40%] translate-x-[-60%] w-[15rem] h-[3rem] p-2 border border-[#317f41] rounded-md border-2" >
+          <div>
+          <Image src={you == "goat" ? '/tiger.png' : '/goat.png'} alt="tiger" width={40} height={40} />
+
+          </div>
+          <div>
+            <p className="text-xl text-[white] font-semibold">{user} {rating}</p>
+          </div>
+
+        </div>
+        <div className="absolute bg-[#143034] border border-[#317f41] rounded-md border-2 bottom-3 flex gap-4 items-center left-[40%] translate-x-[-60%] w-[15rem] h-[3rem] p-2" >
+          <div>
+        <Image src={you == "tiger" ? '/tiger.png' : '/goat.png'} alt="tiger" width={30} height={30} />
+
+          </div>
+          <div>
+            <p className="text-xl text-[white] font-semibold">Aakash (123)</p>
+          </div>
+        </div>
+
+        {
+          (winner == 'tiger_win' || winner == 'goat_win') &&
+          <div  className="h-[100vh] w-[100vw]  absolute top-0 left-0 bg-black opacity-60 flex justify-center pt-[2rem] ">
+          </div>
+        }
+
+        {
+          (winner == 'tiger_win' || winner == 'goat_win') &&
+          <div  className="absolute w-[22vw] pb-5 top-[3rem] left-1/2 translate-x-[-50%] bg-[#143034] z-[100] flex flex-col items-center">
+
+            <div className="mt-2  flex items-center">
+              <p className="text-2xl text-[white] font-bold">
+                {
+                  winner == 'tiger_win' && you == 'tiger' ? `${myname} Win` : winner == 'tiger_win' && you == 'goat' ? `${user} Win` : winner == 'goat_win' && you == 'goat' ? `${myname} Win` : `${user} Win`
+                }
+              </p>
+
+            </div>
+
+              <div className="mt-2 flex items-center  gap-2 mt-2">
+                <div>
+                  <div className={`h-[6rem] w-[6rem] rounded flex justify-center items-center bg-[#fff] ${winner == 'tiger_win' ? 'border border-4 border-[#317f41]': 'border border-4 border-[red]'}`}>
+                  <Image
+                    src="/tiger.png"
+                    alt="tiger"
+                    width={50}
+                    height={50}
+                  />
+                  </div>
+                  <div className="w-full flex justify-center">
+                    <p className="text-md text-[white] font-bold">
+
+                      { you == 'tiger' ? myname : user}
+                    </p>
+                  </div>
+                </div>  
+                    <div>
+                      <p className="text-xl text-[white] font-bold">
+                        vs
+                      </p>
+                    </div>
+                <div>
+                <div className={`h-[6rem] w-[6rem] rounded flex justify-center items-center bg-[#fff] ${winner != 'tiger_win' ? 'border border-4 border-[#317f41]': 'border border-4 border-[red]'}`}>
+                <Image 
+                    src="/goat.png"
+                    alt="tiger"
+                    width={50}
+                    height={50}
+                  />
+                  </div>
+                  <div className="w-full flex justify-center">
+                    <p className="text-md text-[white] font-bold">
+                      { you == 'goat' ? myname : user}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+
+              <div className="mt-2 flex items-center justify-center gap-4 mt-2 h-[4rem] w-[90%]">
+                <p className="text-4xl text-[white] font-bold">{myrating}</p>
+                <p className={` text-xl text-[red] ${winner == 'tiger_win' && you == 'tiger' ? 'text-[#317f41]' : winner == 'tiger_win' && you == 'goat' ? 'text-[red]' : winner == 'goat_win' && you == 'goat' ? 'text-[#317f41]' : 'text-[red]'} font-semibold `}>
+                  {
+                    winner == 'tiger_win' && you == 'tiger' ? '+10' : winner == 'tiger_win' && you == 'goat' ? '-10' : winner == 'goat_win' && you == 'goat' ? '+10' : '-10'
+                  }
+                </p>
+              </div>
+
+
+              <div className="mt-2 flex items-center justify-center gap-4 mt-2 h-[3rem] w-[90%]">
+                
+                <button onClick={()=> window.location.reload()} className="w-[40%] h-[100%] bg-[#317f41] flex justify-center items-center font-bold text-white rounded-[.5rem]">
+                    Rematch
+                </button>
+                <button className="w-[40%] h-[100%] bg-[#317f41] flex justify-center items-center  rounded-[.5rem]">
+                <Link href={'/'} >
+                <p className="font-bold text-white">
+                    Home
+                </p>
+                </Link>
+                </button>
+              </div>
+
+
+              <div className="h-[5rem] w-[22vw] absolute top-[-5] left-0 bg-[black]/70 z-[-1] ">
+              </div>
+          </div>
+
+
+        }
+
+
 
     </div>
   );
