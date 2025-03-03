@@ -10,6 +10,7 @@ import Link from "next/link";
 import axios from "axios";
 import { SoundToggler } from "@/components/shared/soundToggler";
 import { useSound } from "@/context/SoundContext";
+import Modal from "@/components/shared/Modal";
 
 export default function Board() {
   const [loading, setLoading] = useState(false);
@@ -40,6 +41,8 @@ export default function Board() {
     [4, 0],
     [4, 4],
   ]);
+
+  const [winner, setWinner] = useState<string | null>(null);
 
   const [tigerBlocked, setTigerBlocked] = useState(0);
 
@@ -110,17 +113,7 @@ export default function Board() {
     setTimeout(()=>{
     if (capturedGoats >= 5) {
       playTigerWinSound();
-      alert("Tiger Wins");
-      setBoard([
-        [-1, 0, 0, 0, -1],
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0],
-        [-1, 0, 0, 0, -1],
-      ]);
-      setTurn("goat");
-      setTotalGoats(20);
-      setCapturedGoats(0);
+      setWinner("tiger_win");
     } else {
       let flag = true;
       let tigerBlocked_now = 0;
@@ -142,17 +135,7 @@ export default function Board() {
       setTigerBlocked(tigerBlocked_now);
 
       if (flag) {
-        alert("Goat Wins");
-        setBoard([
-          [-1, 0, 0, 0, -1],
-          [0, 0, 0, 0, 0],
-          [0, 0, 0, 0, 0],
-          [0, 0, 0, 0, 0],
-          [-1, 0, 0, 0, -1],
-        ]);
-        setTurn("goat");
-        setTotalGoats(20);
-        setCapturedGoats(0);
+        setWinner("goat_win");
       }
     }
   },1)
@@ -486,24 +469,6 @@ export default function Board() {
                 </div>
               </div>
 
-      {/* <div className="absolute bottom-5 left-5 bg-[url(/audio_wooden.png)]  w-[10rem] h-[10rem] flex justify-center items-center bg-center bg-cover p-3 rounded-full cursor-pointer">
-        <button
-          onClick={() => setMuted(!muted)}
-          className="bg-transparent mt-[-1rem]"
-        >
-          {muted ? (
-            <VolumeX
-              size={44}
-              color="black"
-            />
-          ) : (
-            <Volume2
-              size={44}
-              color="black"
-            />
-          )}
-        </button>
-      </div> */}
       <SoundToggler />
 
       <Link href="/">
@@ -521,6 +486,87 @@ export default function Board() {
           <p className="text-[black] font-bold">AI is Thinking....</p>
         </div>
       )}
+
+        {
+          (winner == 'tiger_win' || winner == 'goat_win') &&
+          <div  className="h-[100vh] w-[100vw]  absolute top-0 left-0 bg-black opacity-60 flex justify-center pt-[2rem] ">
+          </div>
+        }
+
+{
+          (winner == 'tiger_win' || winner == 'goat_win') &&
+          <div  className="absolute w-[22vw] pb-5 top-[3rem] left-1/2 translate-x-[-50%] bg-[#143034] z-[100] flex flex-col items-center">
+
+            <div className="mt-2  flex items-center">
+              <p className="text-2xl text-[white] font-bold">
+                {winner == 'tiger_win' ? "Bot Won" : "PLayer Won"}
+              </p>
+
+            </div>
+
+              <div className="mt-2 flex items-center  gap-2 mt-2">
+                <div>
+                  <div className={`h-[6rem] w-[6rem] rounded flex justify-center items-center bg-[#fff] ${winner == 'tiger_win' ? 'border border-4 border-[#317f41]': 'border border-4 border-[red]'}`}>
+                  <Image
+                    src="/tiger.png"
+                    alt="tiger"
+                    width={50}
+                    height={50}
+                  />
+                  </div>
+                  <div className="w-full flex justify-center">
+                    <p className="text-md text-[white] font-bold">Bot</p>
+                  </div>
+                </div>  
+                    <div>
+                      <p className="text-xl text-[white] font-bold">
+                        vs
+                      </p>
+                    </div>
+                <div>
+                <div className={`h-[6rem] w-[6rem] rounded flex justify-center items-center bg-[#fff] ${winner != 'tiger_win' ? 'border border-4 border-[#317f41]': 'border border-4 border-[red]'}`}>
+                <Image 
+                    src="/goat.png"
+                    alt="tiger"
+                    width={50}
+                    height={50}
+                  />
+                  </div>
+                  <div className="w-full flex justify-center">
+                    <p className="text-md text-[white] font-bold">Player</p>
+                  </div>
+                </div>
+              </div>
+
+
+              <div className="mt-2 flex items-center justify-center gap-4 mt-2 h-[4rem] w-[90%]">
+                <p className="text-4xl text-[white] font-bold">755</p>
+                <p className="text-xl text-[red] font-semibold">-11</p>
+              </div>
+
+
+              <div className="mt-2 flex items-center justify-center gap-4 mt-2 h-[3rem] w-[90%]">
+                
+                <button onClick={()=> window.location.reload()} className="w-[40%] h-[100%] bg-[#317f41] flex justify-center items-center font-bold text-white rounded-[.5rem]">
+                    Rematch
+                </button>
+                <button className="w-[40%] h-[100%] bg-[#317f41] flex justify-center items-center  rounded-[.5rem]">
+                <Link href={'/'} >
+                <p className="font-bold text-white">
+                    Home
+                </p>
+                </Link>
+                </button>
+              </div>
+
+
+              <div className="h-[5rem] w-[22vw] absolute top-[-5] left-0 bg-[black]/70 z-[-1] ">
+              </div>
+          </div>
+
+
+        }
+
     </div>
   );
 }
