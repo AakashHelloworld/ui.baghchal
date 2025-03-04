@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Volume2, VolumeX } from "lucide-react";
+import { Check, Volume2, VolumeX, X } from "lucide-react";
 import Link from "next/link";
 import { SoundToggler } from "../components/shared/soundToggler";
 import { useSound } from "@/context/SoundContext";
@@ -16,12 +16,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 export default function GameOptions() {
   const [step, setStep] = useState("home");
   const [username, setUsername] = useState<string | null>(null);
   const { playClick } = useSound();
-  const { notifications } = useNotification();
+  const { notifications, updateNotificationList } = useNotification();
+  const router = useRouter();
 
   useEffect(() => {
     const user = localStorage.getItem("username");
@@ -33,6 +36,24 @@ export default function GameOptions() {
   const clickBackButtonHandler = () => {
     setStep("home");
     playClick();
+  };
+
+  const handleNotificationRequest = async (
+    id: string,
+    status: string,
+    gameLink?: string
+  ) => {
+    try {
+      updateNotificationList(id);
+      await axios.delete(
+        `http://127.0.0.1:8000/remove-notification/${id}/${status}`
+      );
+      if (status == "ACCEPTED") {
+        router.push(gameLink!);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -62,14 +83,36 @@ export default function GameOptions() {
 
       {notifications &&
         notifications.map((notification, index) => (
-          <Link
-            key={index}
-            href={notification.invitee_link}
+          <div
+            className="absolute bottom-5 right-5 bg-[url(/wooden.png)]  w-[18rem] h-[7rem] flex flex-col justify-start items-center  bg-center bg-cover p-3 rounded-full cursor-pointer
+            "
           >
-            <div className="text-white absolute top-5 right-0 p-4 border rounded-full bg-orange-400 text-xl font-semibold">
-              {notification.inviter} is challenging you!
+            <p className="text-[black] text-lg font-bold mt-[1.3rem]">
+              {notification.inviter} is challenging!{" "}
+            </p>
+            <div className="flex gap-4">
+              <button
+                className="w-[2rem] h-[1.5rem] bg-[green] flex justify-center items-center rounded-md border border-1 border-black"
+                onClick={() =>
+                  handleNotificationRequest(
+                    notification.id,
+                    "ACCEPTED",
+                    notification.invitee_link
+                  )
+                }
+              >
+                <Check color="white" />
+              </button>
+              <button
+                className="w-[2rem] h-[1.5rem] bg-[red] flex justify-center items-center rounded-md border border-1 border-black"
+                onClick={() =>
+                  handleNotificationRequest(notification.id, "REJECTED")
+                }
+              >
+                <X color="white" />
+              </button>
             </div>
-          </Link>
+          </div>
         ))}
 
       <div className="flex flex-col items-center justify-center space-y-1 mb-20">

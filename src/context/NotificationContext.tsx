@@ -6,6 +6,7 @@ import { createContext, useContext } from "react";
 
 interface NotificationContextType {
   notifications: Notification[];
+  updateNotificationList: (id: string) => void;
 }
 
 interface Notification {
@@ -24,6 +25,13 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [notifications, setNotifications] = React.useState<Notification[]>([]);
+
+  const updateNotificationList = (id: string) => {
+    const updatedNotification = notifications.filter(
+      (notification) => notification.id != id
+    );
+    setNotifications(updatedNotification);
+  };
 
   useEffect(() => {
     async function getNotifications() {
@@ -49,7 +57,9 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   return (
-    <NotificationContext.Provider value={{ notifications }}>
+    <NotificationContext.Provider
+      value={{ notifications, updateNotificationList }}
+    >
       {children}
     </NotificationContext.Provider>
   );
