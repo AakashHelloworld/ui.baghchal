@@ -61,9 +61,12 @@ export default function GameOptions() {
       </div>
 
       {notifications &&
-        notifications.map((notification) => (
-          <Link href={notification.invitee_link}>
-            <div className="text-white absolute bottom-5 right-0 p-4 border rounded-full bg-orange-400 text-xl font-semibold">
+        notifications.map((notification, index) => (
+          <Link
+            key={index}
+            href={notification.invitee_link}
+          >
+            <div className="text-white absolute top-5 right-0 p-4 border rounded-full bg-orange-400 text-xl font-semibold">
               {notification.inviter} is challenging you!
             </div>
           </Link>

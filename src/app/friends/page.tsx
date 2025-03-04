@@ -2,6 +2,7 @@
 
 import { useSound } from "@/context/SoundContext";
 import axios from "axios";
+import {Search } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -150,35 +151,35 @@ export default function FriendsPage() {
         </button>
       </Link>
 
-      <div className="flex justify-center items-start space-x-4">
-        <div className="h-[20rem] w-[20rem] bg-gray-100/90 border-black p-4 space-y-4 overflow-hidden rounded-lg">
+      <div className="flex justify-center mt-[7rem] items-start space-x-4">
+        <div className="h-[25rem] w-[20rem] bg-[#143034] border-black p-4 space-y-4 overflow-hidden rounded-lg relative">
           <div className="space-y-2">
-            <h2 className="text-bold text-2xl">Search</h2>
+            <h2 className="text-xl text-[white] font-bold">Search</h2>
 
             <form
               onSubmit={handleSearchFriends}
-              className="flex justify-between items-center"
+              className="flex justify-between items-center gap-2"
             >
               <input
                 placeholder="Search friends..."
-                className="py-1 px-4 rounded-full"
+                className="py-1 px-4 w-full "
                 onChange={(e) => setSearch(e.target.value)}
                 value={search}
               />
               <button
                 type="submit"
-                className="text-white text-bold hover:bg-orange-600 transition-all duration-200 bg-orange-500 py-1 px-2 rounded-lg"
+                className="text-white text-bold hover:bg-[#317f41]/50 transition-all duration-200 bg-[#317f41] py-1 px-4"
               >
-                Search
+                <Search />
               </button>
             </form>
 
             {friend && (
               <>
-                <h2 className="text-bold text-xl">Result:</h2>
+                <h2 className="text-xl text-[white] font-bold">Result:</h2>
                 <div
                   key={friend.id}
-                  className="text-black text-lg flex items-center justify-between"
+                  className="text-[white] text-md flex bg-[#317f41] items-center justify-between p-2"
                 >
                   {friend.username}
                   <button
@@ -193,38 +194,37 @@ export default function FriendsPage() {
 
             {error && (
               <>
-                <h2 className="text-bold text-xl">Result:</h2>
-                <div className="text-black text-lg flex items-center justify-between">
+                <h2 className="text-xl text-[white] font-bold">Result:</h2>
+                <div className="text-[white] text-md flex items-center justify-between">
                   {error}
                 </div>
               </>
             )}
           </div>
 
-          <div className="w-full h-[1px] bg-black" />
+          <div className="w-full h-[1px] bg-[white] " />
 
-          <div className="space-y-3">
-            <h2 className="text-bold text-2xl">All Friends</h2>
+          <div className="space-y-3 absolute bottom-3 w-[90%]">
+            <h2 className="text-xl text-[white] font-bold">All Friends</h2>
 
-            <div className="space-y-1">
+            <div className="space-y-1 h-[10rem] overflow-y-scroll">
               {friends?.map((friend) => (
                 <div
                   key={friend.id}
-                  className="text-black text-lg flex items-center justify-between"
+                  className="text-[white] text-md flex bg-[#317f41] items-center justify-between p-2"
                 >
                   {friend.username}
                   {!chooseTurn ? (
                     <button
-                      className="text-white text-bold hover:bg-orange-600 transition-all duration-200 bg-orange-500 py-1 px-2 rounded-lg"
+                      className="text-white text-bold hover:bg-orange-600 transition-all duration-200 bg-orange-500 py-1 px-2 rounded-lg h-[1.9rem]"
                       onClick={() => setChooseTurn(true)}
                     >
                       Invite
                     </button>
                   ) : (
                     <div className="space-x-1">
-                      <span>Play: </span>
                       <button
-                        className="text-white text-bold hover:bg-orange-600 transition-all duration-200 bg-orange-500 py-1 px-2 rounded-lg"
+                        className="text-white text-bold hover:bg-orange-600 transition-all duration-200 bg-orange-500 py-1 px-2 rounded-lg h-[1.9rem]"
                         onClick={() =>
                           createInviteLink(
                             friend.username,
@@ -236,7 +236,7 @@ export default function FriendsPage() {
                         Tiger
                       </button>
                       <button
-                        className="text-white text-bold hover:bg-orange-600 transition-all duration-200 bg-orange-500 py-1 px-2 rounded-lg"
+                        className="text-white text-bold hover:bg-orange-600 transition-all duration-200 bg-orange-500 py-1 px-2 rounded-lg h-[1.9rem]"
                         onClick={() =>
                           createInviteLink(
                             friend.username,
@@ -255,20 +255,21 @@ export default function FriendsPage() {
           </div>
         </div>
 
-        <div className="h-[20rem] w-[20rem] bg-gray-100/90 border-black p-4 space-y-4 overflow-hidden rounded-lg">
+        <div className="h-[25rem] w-[20rem] bg-[#143034] border-black p-4 space-y-4 overflow-hidden rounded-lg">
           <div className="space-y-4">
-            <h2 className="text-bold text-2xl">Friend Requests</h2>
+            <h2 className="text-xl text-[white] font-bold">Friend Requests</h2>
 
-            <div className="space-y-1">
+            <div className="space-y-1 h-[20.5rem] overflow-y-scroll ">
               {friendRequests?.map((friendRequest) => (
                 <div
                   key={friendRequest?.request_id}
-                  className="text-black text-lg flex items-center justify-between"
+                  className="text-[white] text-md flex bg-[#317f41] items-center justify-between p-2"
                 >
                   {friendRequest?.sender?.username}
+
                   <div className="space-x-1 flex items-center">
                     <button
-                      className="text-white text-bold hover:bg-orange-600 transition-all duration-200 bg-orange-500 py-1 px-2 rounded-lg"
+                      className="text-white text-bold hover:bg-orange-600 transition-all duration-200 bg-orange-500 py-1 px-2 rounded-lg h-[1.9rem]"
                       onClick={() =>
                         respondFriendRequestHandler(
                           "ACCEPTED",
@@ -280,7 +281,7 @@ export default function FriendsPage() {
                       Accept
                     </button>
                     <button
-                      className="text-white text-bold hover:bg-orange-600 transition-all duration-200 bg-orange-500 py-1 px-2 rounded-lg"
+                      className="text-white text-bold hover:bg-orange-600 transition-all duration-200 bg-orange-500 py-1 px-2 rounded-lg h-[1.9rem]"
                       onClick={() =>
                         respondFriendRequestHandler(
                           "REJECTED",
