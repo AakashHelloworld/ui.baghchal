@@ -7,9 +7,19 @@ import { SoundToggler } from "../components/shared/soundToggler";
 import { useSound } from "@/context/SoundContext";
 import { useNotification } from "@/context/NotificationContext";
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
 export default function GameOptions() {
   const [step, setStep] = useState("home");
-  const [username, setUsername] = useState<string | null>("");
+  const [username, setUsername] = useState<string | null>(null);
   const { playClick } = useSound();
   const { notifications } = useNotification();
 
@@ -38,16 +48,22 @@ export default function GameOptions() {
         </Link>
       )}
 
-      {username && (
-        <button className="w-[20rem] h-[8rem] text-black text-[2rem] text-2xl p-3 rounded-full active:scale-90 transition-all bg-[url(/wooden.png)] bg-center bg-cover hover:translate-y-2">
-          {localStorage.getItem("username")}
-        </button>
-      )}
+      <div className="absolute top-5 right-5">
+        {username ? (
+          <DropdownMenuDemo />
+        ) : (
+          <Link href="/auth">
+            <button className="w-[10rem] flex items-center justify-center outline-none h-[4rem] text-black text-[2rem] text-xl p-3 rounded-full active:scale-90 transition-all bg-[url(/wooden.png)] bg-center bg-cover hover:translate-y-2 font-[900]">
+              Login
+            </button>
+          </Link>
+        )}
+      </div>
 
       {notifications &&
         notifications.map((notification) => (
           <Link href={notification.invitee_link}>
-            <div className="text-white absolute top-5 right-0 p-4 border rounded-full bg-orange-400 text-xl font-semibold">
+            <div className="text-white absolute bottom-5 right-0 p-4 border rounded-full bg-orange-400 text-xl font-semibold">
               {notification.inviter} is challenging you!
             </div>
           </Link>
@@ -56,28 +72,29 @@ export default function GameOptions() {
       <div className="flex flex-col items-center justify-center space-y-1 mb-20">
         {step === "home" && (
           <>
-            <Link href="/auth">
-              <button className="w-[20rem] h-[8rem] text-black text-[2rem] text-2xl p-3 rounded-full active:scale-90 transition-all bg-[url(/wooden.png)] bg-center bg-cover hover:translate-y-2 font-[900]">
-                Login
-              </button>
-            </Link>
+            {username && (
+              <Link href="/friends">
+                <button className="w-[20rem] h-[8rem] text-black text-[2rem] text-2xl p-3 rounded-full active:scale-90 transition-all bg-[url(/wooden.png)] bg-center bg-cover hover:translate-y-2 font-[900]">
+                  Friends
+                </button>
+              </Link>
+            )}
             <button
               className="w-[20rem] h-[8rem] text-black text-[2rem] text-2xl p-3 rounded-full active:scale-90 transition-all bg-[url(/wooden.png)] bg-center bg-cover hover:translate-y-2 font-[900]"
               onClick={() => setStep("main")}
             >
-              Play as Guest
+              {username ? "Play" : "Play as Guest"}
             </button>
           </>
         )}
 
         {step === "main" && (
           <>
-            <button
-              className="w-[20rem] h-[8rem] text-black text-[2rem] text-2xl p-3 rounded-full active:scale-90 transition-all bg-[url(/wooden.png)] bg-center bg-cover hover:translate-y-2 font-[900]"
-              onClick={() => setStep("play")}
-            >
-              Play
-            </button>
+            <Link href="/game">
+              <button className="w-[20rem] h-[8rem] text-black text-[2rem] text-2xl p-3 rounded-full active:scale-90 transition-all bg-[url(/wooden.png)] bg-center bg-cover hover:translate-y-2 font-[900]">
+                Same device
+              </button>
+            </Link>
             <button
               className="w-[20rem] h-[8rem] text-black text-[2rem] text-2xl p-3 rounded-full active:scale-90 transition-all bg-[url(/wooden.png)] bg-center bg-cover hover:translate-y-2 font-[900]"
               onClick={() => setStep("computer")}
@@ -137,5 +154,43 @@ export default function GameOptions() {
 
       <SoundToggler />
     </main>
+  );
+}
+
+export function DropdownMenuDemo() {
+  const handleLogout = () => {
+    localStorage.removeItem("userId");
+    localStorage.removeItem("username");
+    localStorage.removeItem("rating");
+    window.location.reload();
+  };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className="w-[10rem] flex items-center justify-center outline-none h-[4rem] text-black text-[2rem] text-xl p-3 rounded-full active:scale-90 transition-all bg-[url(/wooden.png)] bg-center bg-cover hover:translate-y-2 font-[900]">
+          Profile
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56 bg-[#143034] border-none text-white">
+        <DropdownMenuLabel className="text-lg">My Game Info</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuItem className="text-[16px]">
+            Username: {localStorage.getItem("username")}
+          </DropdownMenuItem>
+          <DropdownMenuItem className="text-[16px]">
+            Rating: {localStorage.getItem("rating")}
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          className="text-[16px]"
+          onClick={handleLogout}
+        >
+          Log out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
