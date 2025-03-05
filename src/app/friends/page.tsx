@@ -2,7 +2,7 @@
 
 import { useSound } from "@/context/SoundContext";
 import axios from "axios";
-import {Search } from "lucide-react";
+import { Search } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -121,6 +121,12 @@ export default function FriendsPage() {
       }
     }
     getAllFriends();
+
+    const interval = setInterval(() => {
+      getAllFriends();
+    }, 10000);
+
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -138,6 +144,12 @@ export default function FriendsPage() {
       }
     }
     getAllFriendRequests();
+
+    const interval = setInterval(() => {
+      getAllFriendRequests();
+    }, 10000);
+
+    return () => clearInterval(interval);
   }, []);
 
   return (
