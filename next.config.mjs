@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: false, // Disable Strict Mode
+
   async rewrites() {
     return [
       {
@@ -8,6 +10,7 @@ const nextConfig = {
       },
     ];
   },
+
   webpack(config) {
     config.module.rules.push({
       test: /\.(mp3|wav)$/,
@@ -23,7 +26,6 @@ const nextConfig = {
 
     return config;
   },
-
 };
 
 export default nextConfig;

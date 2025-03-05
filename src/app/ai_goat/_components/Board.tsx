@@ -177,7 +177,7 @@ export default function Board() {
     setLoading(true); // Start loading
     try {
 
-      const response = await axios.post("http://127.0.0.1:8000/get_moves_goat", {
+      const response = await axios.post("https://baghchal-api.vercel.app/get_moves_goat", {
         board: board,
         tigers: tigerPositions,
         total_goats: totalGoats,
