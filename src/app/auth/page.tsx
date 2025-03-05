@@ -18,10 +18,13 @@ export default function AuthPage() {
     console.log({ username, password });
 
     try {
-      const response = await axios.post("http://127.0.0.1:8000/login", {
-        username,
-        password,
-      });
+      const response = await axios.post(
+        "https://baghchal-server-api.vercel.app/login",
+        {
+          username,
+          password,
+        }
+      );
       const user = response.data.user.username;
       const id = response.data.user.id;
       const rating = response.data.user.rating;
@@ -36,10 +39,13 @@ export default function AuthPage() {
 
   const register = async () => {
     try {
-      const response = await axios.post("http://127.0.0.1:8000/register", {
-        username,
-        password,
-      });
+      const response = await axios.post(
+        "https://baghchal-server-api.vercel.app/register",
+        {
+          username,
+          password,
+        }
+      );
       const status = response.data.success;
       if (status === true) {
         setAuthPage("login");

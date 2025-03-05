@@ -33,7 +33,7 @@ export default function FriendsPage() {
     e.preventDefault();
     try {
       const response = await axios.get(
-        `http://127.0.0.1:8000/search-friends?username=${search}`
+        `https://baghchal-server-api.vercel.app/search-friends?username=${search}`
       );
 
       const result = response.data.friend;
@@ -53,7 +53,7 @@ export default function FriendsPage() {
   ) => {
     try {
       await axios.post(
-        `http://127.0.0.1:8000/respond-friend-request/${id}?response=${value}`
+        `https://baghchal-server-api.vercel.app/respond-friend-request/${id}?response=${value}`
       );
 
       const updatedRequests = friendRequests.filter(
@@ -74,7 +74,7 @@ export default function FriendsPage() {
     try {
       const sender_id = localStorage.getItem("userId");
       const response = await axios.post(
-        `http://127.0.0.1:8000/send-friend-request`,
+        `https://baghchal-server-api.vercel.app/send-friend-request`,
         {
           sender_id,
           receiver_id,
@@ -97,7 +97,7 @@ export default function FriendsPage() {
     const inviter_rating = localStorage.getItem("rating");
     try {
       const response = await axios.post(
-        `http://127.0.0.1:8000/invite/${inviter_username}/${invitee_username}/${turn}/${inviter_rating}/${invitee_rating}`
+        `https://baghchal-server-api.vercel.app/invite/${inviter_username}/${invitee_username}/${turn}/${inviter_rating}/${invitee_rating}`
       );
       const invites = response.data.invites;
       if (invites) {
@@ -113,7 +113,7 @@ export default function FriendsPage() {
       try {
         const userId = localStorage.getItem("userId");
         const response = await axios.get(
-          `http://127.0.0.1:8000/get-all-friends/${userId}`
+          `https://baghchal-server-api.vercel.app/get-all-friends/${userId}`
         );
         setFriends(response.data.friends);
       } catch (error) {
@@ -134,7 +134,7 @@ export default function FriendsPage() {
       try {
         const userId = localStorage.getItem("userId");
         const response = await axios.get(
-          `http://127.0.0.1:8000/friend-requests/${userId}`
+          `https://baghchal-server-api.vercel.app/friend-requests/${userId}`
         );
         console.log(response.data);
 

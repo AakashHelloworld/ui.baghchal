@@ -38,7 +38,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
       try {
         const username = localStorage.getItem("username");
         const response = await axios.get(
-          `http://127.0.0.1:8000/view-invites/${username}`
+          `https://baghchal-server-api.vercel.app/view-invites/${username}`
         );
         const invites = response.data.invites;
         console.log(invites);

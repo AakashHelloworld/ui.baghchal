@@ -46,7 +46,7 @@ export default function GameOptions() {
     try {
       updateNotificationList(id);
       await axios.delete(
-        `http://127.0.0.1:8000/remove-notification/${id}/${status}`
+        `https://baghchal-server-api.vercel.app/remove-notification/${id}/${status}`
       );
       if (status == "ACCEPTED") {
         router.push(gameLink!);
