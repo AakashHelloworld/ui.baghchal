@@ -84,6 +84,7 @@ export default function GameOptions() {
       {notifications &&
         notifications.map((notification, index) => (
           <div
+            key={index}
             className="absolute bottom-5 right-5 bg-[url(/wooden.png)]  w-[18rem] h-[7rem] flex flex-col justify-start items-center  bg-center bg-cover p-3 rounded-full cursor-pointer
             "
           >
